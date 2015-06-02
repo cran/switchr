@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>The switchr package</title>
+<meta name="author" content="(Gabriel Becker (@groundwalkergmb))"/>
+
+<link rel="stylesheet" href="file:///home/beckerg4/gabe/checkedout/reveal.js/css/reveal.min.css"/>
+<link rel="stylesheet" href="file:///home/beckerg4/gabe/checkedout/reveal.js/css/theme/sky.css" id="theme"/>
+
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'file:///home/beckerg4/gabe/checkedout/reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+<body>
+<style type="text/css">p { text-align: left; }</style>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1>The switchr package</h1>
+<h2>Gabriel Becker</h2>
+<h2><a href="mailto:Genentech">Genentech</a>, <a href="mailto:Inc <becker.gabe@gene.com>">Inc <becker.gabe@gene.com></a></h2>
+<h2></h2></section>
+
+
+
+<section>
+<section id="sec-1" >
+
+<h2><span class="section-number-2">1</span> Package versions matter</h2>
+</section>
+<section id="sec-1-1" >
+
+<h3><span class="section-number-3">1.1</span> Reproducing results</h3>
+<ul class="org-ul">
+<li>Use same version as original author(s)
+</li>
+</ul>
+</section>
+<section id="sec-1-2" >
+
+<h3><span class="section-number-3">1.2</span> Developing packages</h3>
+<ul class="org-ul">
+<li>Program against latest/devel versions of dependencies
+</li>
+</ul>
+</section>
+<section id="sec-1-3" >
+
+<h3><span class="section-number-3">1.3</span> Collaboration</h3>
+<ul class="org-ul">
+<li>Have single set of versions used by all participants
+</li>
+</ul>
+</section>
+
+</section>
+<section>
+<section id="sec-2" >
+
+<h2><span class="section-number-2">2</span> Packages live in different places</h2>
+</section>
+<section id="sec-2-1" >
+
+<h3><span class="section-number-3">2.1</span> Github</h3>
+</section>
+<section id="sec-2-2" >
+
+<h3><span class="section-number-3">2.2</span> Package repositories</h3>
+</section>
+<section id="sec-2-3" >
+
+<h3><span class="section-number-3">2.3</span> CRAN Archive</h3>
+</section>
+<section id="sec-2-4" >
+
+<h3><span class="section-number-3">2.4</span> SCM commit history</h3>
+</section>
+
+</section>
+<section>
+<section id="sec-3" >
+
+<h2><span class="section-number-2">3</span> What do we need?</h2>
+</section>
+<section id="sec-3-1" >
+
+<h3><span class="section-number-3">3.1</span> Install the versions we need</h3>
+<ul class="org-ul">
+<li>on command
+</li>
+<li>directly from where they live
+</li>
+</ul>
+</section>
+<section id="sec-3-2" >
+
+<h3><span class="section-number-3">3.2</span> Distinct, side-by-side package libraries</h3>
+<ul class="org-ul">
+<li>Don't want to clobber our main install to reproduce old result
+</li>
+<li>Development and analysis
+</li>
+</ul>
+</section>
+<section id="sec-3-3" >
+
+<h3><span class="section-number-3">3.3</span> Recreate others' environments</h3>
+</section>
+<section id="sec-3-4" >
+
+<h3><span class="section-number-3">3.4</span> Publish our environments</h3>
+<ul class="org-ul">
+<li>So that others can recreate them
+</li>
+</ul>
+</section>
+
+</section>
+<section>
+<section id="sec-4" >
+
+<h2><span class="section-number-2">4</span> switchr does that</h2>
+</section>
+
+</section>
+<section>
+<section id="sec-5" >
+
+<h2><span class="section-number-2">5</span> Package manifests</h2>
+</section>
+<section id="sec-5-1" >
+
+<h3><span class="section-number-3">5.1</span> Generalized Package repository</h3>
+<ul class="org-ul">
+<li>List of packages
+<ul class="org-ul">
+<li>where their source lives
+</li>
+<li>info necessary to retrieve them
+</li>
+</ul>
+</li>
+<li>Optional version restrictions
+</li>
+</ul>
+</section>
+</section>
+<section>
+<section id="sec-6" >
+
+<h2><span class="section-number-2">6</span> And now the 'main' event</h2>
+</section>
+<section id="sec-6-1" >
+
+<h3><span class="section-number-3">6.1</span> Creating a new library</h3>
+<div class="org-src-container">
+
+<pre  class="src src-R">switchTo("mynewlib")
+</pre>
+</div>
+
+<pre class="example">
+Switched to the 'mynewlib' computing environment. 29 packages are currently available. Packages installed in your site library ARE suppressed.
+ To switch back to your previous environment type switchBack()
+</pre>
+
+
+</section>
+<section id="sec-6-2" >
+
+<h3><span class="section-number-3">6.2</span> Switching between libraries</h3>
+<div class="org-src-container">
+
+<pre  class="src src-R">switchBack()
+</pre>
+</div>
+
+<pre class="example">
+Reverted to the 'recreate' computing environment. 33 packages are currently available. Packages installed in your site library ARE suppressed.
+ To switch back to your previous environment type switchBack()
+</pre>
+
+
+<div class="org-src-container">
+
+<pre  class="src src-R">switchTo("mynewlib")
+</pre>
+</div>
+
+<pre class="example">
+Switched to the 'mynewlib' computing environment. 29 packages are currently available. Packages installed in your site library ARE suppressed.
+ To switch back to your previous environment type switchBack()
+</pre>
+
+</section>
+<section id="sec-6-3" >
+
+<h3><span class="section-number-3">6.3</span> Creating a manifest</h3>
+<div class="org-src-container">
+
+<pre  class="src src-R">man = GithubManifest("gmbecker/fastdigest", "gmbecker/RCacheSuite",
+    "duncantl/CodeDepends")
+man
+</pre>
+</div>
+
+<pre class="example">
+A package manifest (PkgManifest object)
+
+Contains 3 packages and 5 dependency repositories
+
+Packages:
+         name type
+1  fastdigest  git
+2 RCacheSuite  git
+3 CodeDepends  git
+</pre>
+
+</section>
+<section id="sec-6-4" >
+
+<h3><span class="section-number-3">6.4</span> Installing from a manifest</h3>
+<div class="org-src-container">
+
+<pre  class="src src-R">install_packages("RCacheSuite", man)
+</pre>
+</div>
+<div class="org-src-container">
+
+<pre  class="src src-R">head(installed.packages()[,c("Package", "Version")], 4)
+</pre>
+</div>
+
+<pre class="example">
+            Package       Version   
+CodeDepends "CodeDepends" "0.3-5"   
+fastdigest  "fastdigest"  "0.5-1"   
+RCacheSuite "RCacheSuite" "0.0-1"   
+XML         "XML"         "3.98-1.1"
+</pre>
+
+</section>
+<section id="sec-6-5" >
+
+<h3><span class="section-number-3">6.5</span> Generating a manifest from a library</h3>
+<div class="org-src-container">
+
+<pre  class="src src-R">man2 = libManifest()
+man2
+</pre>
+</div>
+
+<pre class="example">
+A seeding manifest (SessionManifest object)
+
+Describes a cohort of 4 package versions. 
+4 packages are listed in the underlying package manifest
+
+Package versions:
+         name  version
+1 CodeDepends    0.3-5
+2  fastdigest    0.5-1
+3 RCacheSuite    0.0-1
+4         XML 3.98-1.1
+</pre>
+
+</section>
+<section id="sec-6-6" >
+
+<h3><span class="section-number-3">6.6</span> Generating a library from a manifest</h3>
+<div class="org-src-container">
+
+<pre  class="src src-R">switchTo("recreate", seed = man2)
+</pre>
+</div>
+
+</section>
+<section id="sec-6-7" >
+
+<h3><span class="section-number-3">6.7</span> Publishing a manifest to a Gist</h3>
+<div class="org-src-container">
+
+<pre  class="src src-R">library(switchrGist)
+publishManifest(man, Gist())
+</pre>
+</div>
+
+</section>
+<section id="sec-6-8" >
+
+<h3><span class="section-number-3">6.8</span> Traveling back in time</h3>
+<div class="org-src-container">
+
+<pre  class="src src-R">man3.0 = rVersionManifest("3.0.0")
+man3.0
+</pre>
+</div>
+
+<pre class="example">
+ "..."       "..."    
+5005 "zmatrix"   "tarball"
+5006 "zoeppritz" "tarball"
+5007 "zoo"       "tarball"
+5008 "zooimage"  "tarball"
+5009 "zyp"       "tarball"
+</pre>
+</section>
+
+</section>
+<section>
+<section id="sec-7" >
+
+<h2><span class="section-number-2">7</span> The code</h2>
+<p>
+<a href="http://github.com/gmbecker/switchr">http://github.com/gmbecker/switchr</a>
+<a href="http://github.com/gmbecker/switchrGist">http://github.com/gmbecker/switchrGist</a>
+</p>
+</section>
+</section>
+</div>
+</div>
+
+<script src="file:///home/beckerg4/gabe/checkedout/reveal.js/lib/js/head.min.js"></script>
+<script src="file:///home/beckerg4/gabe/checkedout/reveal.js/js/reveal.min.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: false,
+center: true,
+slideNumber: true,
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'file:///home/beckerg4/gabe/checkedout/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+ { src: 'file:///home/beckerg4/gabe/checkedout/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: 'file:///home/beckerg4/gabe/checkedout/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: 'file:///home/beckerg4/gabe/checkedout/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+ { src: 'file:///home/beckerg4/gabe/checkedout/reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+ { src: 'file:///home/beckerg4/gabe/checkedout/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+]
+});
+</script>
+</body>
+</html>
