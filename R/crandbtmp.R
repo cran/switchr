@@ -9,7 +9,7 @@ globalVariables("fromJSON")
 ##' @param curr_avail The output from available.packages(). Used to identify
 ##' whether the necessary version is in the CRAN archive or normal repository
 ##' 
-##' @return A PkgManifest object
+##' @return A SessionManifest object
 ##' @references "Gabor Csardi" (2014). crandb: Query the unofficial CRAN metadata
 ##'  database. R package version 1.0.0. https://github.com/metacran/crandb
 ##' @author Gabriel Becker
@@ -30,8 +30,11 @@ rVersionManifest = function(vers, curr_avail = available.packages()) {
     close(con)
     cont = RJSONIO::fromJSON(resp)
     tb_urls = buildTarURLs(cont, curr_avail)
-    PkgManifest(name = names(cont), url = tb_urls, type = "tarball",
+    man = PkgManifest(name = names(cont), url = tb_urls, type = "tarball",
                 dep_repos = character())
+    vers = gsub(".*_(.*)\\.tar\\.gz", "\\1", tb_urls)
+    names(vers) = names(cont)
+    SessionManifest(man, versions = vers)
 }
 
 
@@ -58,7 +61,7 @@ rVersionManifest = function(vers, curr_avail = available.packages()) {
 ##' should be counted.
 ##' @param delay Number of seconds to delay between successive REST calls
 ##' to the crandb database. Defaults to 1 second
-##' @return A PkgManifest object
+##' @return A SessionManifest object
 ##' @references "Gabor Csardi" (2014). crandb: Query the unofficial CRAN metadata
 ##'  database. R package version 1.0.0. https://github.com/metacran/crandb
 ##' @note Some packages retain the same version on CRAN for long periods of
@@ -133,8 +136,10 @@ cranPkgVersManifest = function(pkg, vers, earliest = TRUE,
     }
         
     pkgurls = buildTarURLs(versneeded, cur_avail)
-    PkgManifest(name = names(versneeded), url = pkgurls, type = "tarball",
+    man = PkgManifest(name = names(versneeded), url = pkgurls, type = "tarball",
                 dep_repos = character())
+    SessionManifest(man, versions = data.frame(name = names(versneeded), version = versneeded,
+                                               stringsAsFactors = FALSE))
     
 }
 

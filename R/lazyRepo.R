@@ -106,13 +106,15 @@ setMethod("lazyRepo", c(pkgs = "character", pkg_manifest = "PkgManifest"),
                    param = SwitchrParam(),
                    force_refresh = FALSE){
 
+             
               pkgsNeeded = pkgs
 
               mandf = manifest_df(pkg_manifest)
               avail = available.packages(contrib.url(dep_repos(pkg_manifest), type="source"), type="source")
 
               repdir = normalizePath2(file.path(rep_path, "src", "contrib"))
-              dir.create(repdir, recursive = TRUE)
+              if(!file.exists(repdir))
+                  dir.create(repdir, recursive = TRUE)
               fakerepo = makeFileURL(repdir)
               innerFun = function(src, pkgname, version, dir, param, force_refresh= FALSE) {
                   ## if we only select 1 row we get a character :(
@@ -127,7 +129,12 @@ setMethod("lazyRepo", c(pkgs = "character", pkg_manifest = "PkgManifest"),
                       pkgsNeeded <<- setdiff(pkgsNeeded, pkgname)
                       return()
                   }
-                  
+
+                  if(is(src, "TarballSource") && !is.na(version)) {
+                      v = gsub(".*_(.*)\\.(tar|zip).*", "\\1", location(src))
+                      if(compareVersion(v, version) != 0)
+                          stop("Got a tarball source (direct link) to the wrong package version for package ", pkgname, ". Likely inconsistent Seeding Manifest")
+                  }
                   tballpat =  paste(pkgname, "_", version,sep="")
 
                   tmpdir = tempdir()
@@ -156,8 +163,10 @@ setMethod("lazyRepo", c(pkgs = "character", pkg_manifest = "PkgManifest"),
                      desc = fileFromBuiltPkg(exInRepo[1], files = .descInTB(src, FALSE),
                                              exdir = tmpdir)
                      dcf = read.dcf(file.path(tmpdir, pkgname,subdir(src), "DESCRIPTION")) 
-                     
-                  } else if(!is.na(version)) {
+
+                     ## tarballs don't really support versions. We will check if it
+                     ## is the right version below and throw an error if it isn't
+                 } else if(!is.na(version) && !is(src, "TarballSource")) {
        
                       pkgfile = locatePkgVersion( src@name, version, pkg_manifest = pkg_manifest,
                           dir = dir, param = param)
@@ -244,28 +253,35 @@ setMethod("lazyRepo", c(pkgs = "character", pkg_manifest = "PkgManifest"),
               pkgsNeeded = setdiff(pkgsNeeded, avail[,"Package"])
               cnt =1 
               while(length(pkgsNeeded) && cnt < 1000){
+                  
                   pkg = pkgsNeeded[1]
-                  vers = versions[pkgs == pkg]
-                  if(!length(vers))
-                      vers = NA
-                      
-                  if(pkg %in% mandf$name) {
-                      manrow = mandf[mandf$name == pkg, ]
-                      ##https://github.com/gmbecker/ProteinVis/archive/IndelsOverlay.zip
-                      ## for IndelsOverlay branch
-                      src = makeSource(name = pkg,
-                          type = manrow$type,
-                          url = manrow$url, branch = manrow$branch,
-                          subdir = manrow$subdir,
-                          scm_auth = scm_auths)
-                      innerFun(src, pkg, version = vers, dir = repdir,
-                               param = param,
-                               force_refresh = force_refresh) 
-                  } else if(pkg %in% avail[,"Package"])
+                  ## base packages are not installable and can't be safely replaced
+                  ## within an R installation
+                  if(pkg %in% basepkgs)
                       pkgsNeeded <<- setdiff(pkgsNeeded, pkg)
-                  else
-                      stop(sprintf("Unable to locate package %s", pkg))
+                  else {
+                      vers = versions[pkgs == pkg]
+                      if(!length(vers))
+                          vers = NA
+                      
+                      if(pkg %in% mandf$name) {
+                          manrow = mandf[mandf$name == pkg, ]
+                          ##https://github.com/gmbecker/ProteinVis/archive/IndelsOverlay.zip
+                          ## for IndelsOverlay branch
+                          src = makeSource(name = pkg,
+                              type = manrow$type,
+                              url = manrow$url, branch = manrow$branch,
+                              subdir = manrow$subdir,
+                              scm_auth = scm_auths)
+                          innerFun(src, pkg, version = vers, dir = repdir,
+                                   param = param,
+                                   force_refresh = force_refresh) 
+                      } else if(pkg %in% avail[,"Package"])
+                            pkgsNeeded <<- setdiff(pkgsNeeded, pkg)
+                        else
+                            stop(sprintf("Unable to locate package %s", pkg))
                                         #    }
+                  }
                   cnt = cnt + 1
               }
               write_PACKAGES(repdir, type="source")

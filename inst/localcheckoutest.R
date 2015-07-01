@@ -1,12 +1,11 @@
 library(switchr)
-x = defaultRepos()
-biocpkgs = c(available.packages(contrib.url(x[1]))[,"Package"], "SummarizedExperiment")
 
+man = BiocSVNManifest()
 
-man = PkgManifest(name = biocpkgs, url = makeBiocSVNURL(biocpkgs), type = "svn")
-
-
-
+## use whatever permanent directory you want to place checkouts in.
+## You can then work on the working copies within that directory and
+## rebuilding the lazyRepo will reflect those changes.
 repo = lazyRepo("rtracklayer", man, dir = "~/localcheckoutest", verbose=TRUE)
+
 
 

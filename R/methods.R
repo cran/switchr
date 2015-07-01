@@ -33,7 +33,12 @@ Renvs= new.env()
 ##' important and intended (e.g. when switching to using Bioc devel from Bioc
 ##' release).
 ##'
-##'
+##' @note By default, this process involves a call to \code{flushSession} which will
+##' attempt to unload all loaded packages. While some support of configuring
+##' what is unloaded is provided via \code{switchrDontUnload}, it is recommended
+##' that you turn this feature entirely off via \code{switchrNoUnload(TRUE)} when
+##' using switchr within dyanmic documents (.Rnw/.Rmd files, etc), particularly
+##' when using the knitr package.
 ##' @return Invisibly returns the SwitchrCtx object representing the new
 ##' computing environment
 ##'
@@ -155,8 +160,8 @@ setMethod("switchTo", c(name = "character", seed= "SwitchrCtx"),
                   rvers = paste(R.version$major, R.version$minor, sep=".")
               exsting = findCompEnv(name = name, rvers = rvers)
               if(!is.null(exsting)) {
-                  warning("A switchr context with that name already exists")
-                  switchTo(exsting)
+                  message("Found existing switchr context. Ignoring seed value")
+                  return(switchTo(exsting))
               }
               cenv = makeLibraryCtx(name = name, seed = NULL,
                   exclude.site = seed@exclude.site,
@@ -164,9 +169,7 @@ setMethod("switchTo", c(name = "character", seed= "SwitchrCtx"),
               
               ## copy existing library contents to the new one
               dirs = list.dirs(file.path(switchrBaseDir(), seed@name), recursive = FALSE)
-            ##  dests = file.path(library_paths(cenv)[1], basename(dirs))
-    ##          dir.create(dests)
-     ##         mapply(file.copy,dirs, dests, recursive=TRUE)
+
               file.copy(dirs, library_paths(cenv)[1],
                         recursive = TRUE, overwrite = FALSE)
 
@@ -269,7 +272,8 @@ setMethod("switchTo", c(name = "SwitchrCtx", seed = "ANY"), function(name, seed,
             Renvs$stack = list(original = SwitchrCtx("original", paths, exclude.site=FALSE, seed = NULL))
         }
 
-        flushSession()
+        if(!switchrNoUnload())
+            flushSession()
 
         .libPaths2(library_paths(name), name@exclude.site)
         
@@ -314,8 +318,8 @@ setMethod("switchTo", c("character", seed = "PkgManifest"),
                   rvers = paste(R.version$major, R.version$minor, sep=".")
               exsting = findCompEnv(name = name, rvers = rvers)
               if(!is.null(exsting)) {
-                  warning("A switchr context with that name already exists")
-                  switchTo(exsting)
+                  message("Found existing switchr context. Ignoring seed value")
+                  return(switchTo(exsting))
               }
               cenv = makeLibraryCtx(name = name, seed = NULL,
                   ...)
@@ -343,8 +347,8 @@ setMethod("switchTo", c("character", seed = "SessionManifest"),
                   rvers = paste(R.version$major, R.version$minor, sep=".")
               exsting = findCompEnv(name = name, rvers = rvers)
               if(!is.null(exsting)) {
-                  warning("A switchr context with that name already exists")
-                  switchTo(exsting)
+                  message("Found existing switchr context. Ignoring seed value")
+                  return(switchTo(exsting))
               }
               cenv = makeLibraryCtx(name = name, seed = NULL,
                   ...)

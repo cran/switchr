@@ -435,7 +435,10 @@ setGeneric("addPkg", function(x, ..., rows = makeManifest(...),
 ##' @aliases addPkg,PkgManifest
 setMethod("addPkg", "PkgManifest",
           function(x, ..., rows= makeManifest(...), versions) {
-              manifest_df(x) = rbind(manifest_df(x), manifest_df(rows))
+              oldman = manifest_df(x)
+              newman = manifest_df(rows)
+              oldman = oldman[,names(newman)]
+              manifest_df(x) = rbind(oldman, newman)
               dep_repos = unique(c(dep_repos(x), dep_repos(rows)))
               x
           })
@@ -444,9 +447,16 @@ setMethod("addPkg", "PkgManifest",
 setMethod("addPkg", "SessionManifest",
           function(x, ..., rows, versions) {
               manifest(x) = addPkg(manifest(x), ..., rows = rows, versions = NULL)
-              if(any(versions$name %in% versions_df(x)$name))
-                  stop("Version already set for one or more packages")
-              versions_df(x) = rbind(versions_df(x), versions)
+              if(!missing(versions) && length(versions) > 0) {
+                  if(is(versions, "character"))
+                      versions = data.frame(name = names(versions),
+                          version = versions, stringsAsFactors = FALSE)
+                  if(any(versions$name %in% versions_df(x)$name))
+                      stop("Version already set for one or more packages")
+                  oldv = versions_df(x)
+                  versions = versions[,names(oldv)]
+                  versions_df(x) = rbind(oldv, versions)
+              }
               x
           })
 

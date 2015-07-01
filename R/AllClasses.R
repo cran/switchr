@@ -6,7 +6,9 @@ setOldClass("sessionInfo")
 ##' @export
 setClass("SwitchrParam", representation(logfun = "function", shell_init = "character",
                                         archive_timing="numeric", archive_retries="numeric",
-                                        dl_method = "character"))
+                                        dl_method = "character"),
+         prototype = prototype(logfun = message, shell_init = "", archive_timing = 2, archive_retries = 2,
+                          dl_method = "auto"))
 
 
 
@@ -133,6 +135,7 @@ setClass("PkgManifest", representation( manifest = "data.frame",
 ##' switchr framework.
 ##' @export
 ##' @aliases PkgManifest-class
+##' @importFrom utils read.table
 PkgManifest = function(manifest = ManifestRow(...), dep_repos = defaultRepos(), ..., dl_method){
     if(is.character(manifest)) {
         if(url.exists(manifest)) {
@@ -147,9 +150,10 @@ PkgManifest = function(manifest = ManifestRow(...), dep_repos = defaultRepos(), 
             manifest  = fil
         }
 
-        if(file.exists(manifest))
+        if(file.exists(manifest)) {
             manifest = read.table(manifest, header= TRUE, sep= ",", stringsAsFactors = FALSE, ...)
-        else
+            manifest = manifest[,names(ManifestRow())]
+        } else
             stop("invalid manifest")
     }
 
@@ -179,11 +183,20 @@ setClass("SessionManifest", representation(pkg_versions = "data.frame",
 ##' information, and a data.frame defining a filter with exact versions
 ##' of some or all packages
 ##' @param manifest A PkgManifest
-##' @param versions A data.frame with 2 columns: name and version.
+##' @param versions A data.frame with 2 columns: name and version, or a named
+##' character vector. In the case of a character vector, the names are taken to
+##' be package names
 ##' @return A SessionManifest object
 ##' @aliases SessionManifest-class
 ##' @export
-SessionManifest = function(manifest, versions) {
+SessionManifest = function(manifest, versions = character()) {
+    if(is(versions, "character"))
+        versions = data.frame(name = as.character(names(versions)), version = versions,
+            stringsAsFactors=FALSE)
+    unknown = setdiff(versions$name, manifest_df(manifest)$name)
+    if(length(unknown) > 0)
+        stop("Setting version constraints on packages not listed in the manifest is not currently supported")
+    
     new("SessionManifest", pkg_versions = versions, pkg_manifest = manifest)
 }
 
