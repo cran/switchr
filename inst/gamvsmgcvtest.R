@@ -1,5 +1,6 @@
 ##http://stackoverflow.com/questions/22126611/r-package-conflict-between-gam-and-mgcv
 
+library(switchr)
                                         # fresh session
 t.s1 <- search()
 t.lN1 <- loadedNamespaces()
@@ -21,6 +22,7 @@ t.s2 <- search()
 t.lN2 <- loadedNamespaces()
 identical(t.s1,t.s2)
 identical(t.lN1,t.lN2)
+flushSession()
 
 # attach and detach mgcv
 library(mgcv)
@@ -35,6 +37,8 @@ t.s2 <- search()
 t.lN2 <- loadedNamespaces()
 identical(t.s1,t.s2)
 identical(t.lN1,t.lN2)
+
+flushSession()
 
 # use package gam again and produce errors
 library(gam)

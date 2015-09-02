@@ -1,7 +1,5 @@
-globalVariables("biocinstallRepos")
-
 getBiocRepos = function() {
-    if(requireNamespace("BiocInstaller", quietly=TRUE)) {
+    if(requireNamespace2("BiocInstaller", quietly=TRUE)) {
         bioc = BiocInstaller::biocinstallRepos()
     } else {
         if(is.null(defaultBiocRepos)) {
@@ -14,7 +12,6 @@ getBiocRepos = function() {
     bioc
 }
 
-globalVariables("defaultGRANURL")
 
 
 
@@ -50,8 +47,8 @@ defaultRepos = function() {
         
 
     granrepos = NULL
-    if(exists("defaultGRANURL"))
-        granrepos = defaultGRANURL()
+    if(exists("defaultGRANURL")) 
+        granrepos = get("defaultGRANURL")()
     repos = unique(c(granrepos, optrepos, bioc))
     repos
 }

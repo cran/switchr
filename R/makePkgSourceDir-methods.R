@@ -5,12 +5,10 @@ setMethod("makePkgDir", c(name = "ANY", source = "SVNSource"),
           function(name, source, path, latest_only = FALSE, param,
                    forceRefresh = FALSE) {
               lfun = logfun(param)
-              oldwd = getwd()
-              on.exit(setwd(oldwd))
               if(!file.exists(path))
                   dir.create(path, recursive = TRUE)
-              setwd(path)
-              
+              oldwd = setwd(path)
+              on.exit(setwd(oldwd))              
               if(missing(name))
                   name = basename(location(source))
               
@@ -87,41 +85,57 @@ setMethod("makePkgDir", c(name = "ANY", source = "GithubSource"),
                           destdir)
                                         #              uzdir
           } else {
-              source = as(source, "GitSource", strict = TRUE)
-              makePkgDir(name, source, path, latest_only, param = param, forceRefresh)
+          #    source = as(source, "GitSource", strict = TRUE)
+           #   makePkgDir(name, source, path, latest_only, param = param, forceRefresh)
+              callNextMethod()
           }
       })
 
                                         #setMethod("makePkgSourceDir", c(name = "ANY", source = "GitSource"), function(name, source, path,  repo) {
 ##'@rdname makePkgDir
 ##' @aliases makePkgDir,ANY,GitSource
-
 setMethod("makePkgDir", c(name = "ANY", source = "GitSource"),
           function(name, source, path, latest_only = FALSE, param, forceRefresh=FALSE)
       {
-          oldwd = getwd()
-          on.exit(setwd(oldwd))
+
           if(!file.exists(path))
               dir.create(path, recursive = TRUE)
-          setwd(path)
+          oldwd = setwd(path)
+          if(!is.null(oldwd))
+              on.exit(setwd(oldwd))
+          else
+              warning("working directory returned as NULL, unable to reset it after creating pkg directory")
           sdir = location(source)
           if(file.exists(name) &&
-             file.exists(file.path(name, ".git"))) {
+             file.exists(file.path(name, ".git")) &&
+               file.exists(file.path(name, "DESCRIPTION"))) {
               logfun(param)(name, "Existing temporary checkout found at this location. Updating")
               up = updateGit(file.path(path, name), source, param = param)
           } else {
               if(file.exists(name))
-                  unlink(name)
-              cmd = paste("git clone", sdir, name, ";cd", name, "; git checkout", branch(source))
+                  unlink(name, recursive=TRUE )
+              cmd = paste("git clone", sdir, name)
               res = tryCatch(system_w_init(cmd, intern=TRUE, param = param),
                   error=function(x) x)
               if(is(res, "error") || (!is.null(attr(res, "status")) && attr(res, "status") > 0))
               {
-                  logfun(param)(name, paste("Failed to check out package source using command:", cmd),
+                  logfun(param)(name, paste("Failed to clone package source using command:", cmd),
                                type="both")
                   logfun(param)(name, res, type="error")
                   return(FALSE)
               }
+              medwd = setwd(name)
+              cmd2 = paste( " git checkout", branch(source))
+              res2 = tryCatch(system_w_init(cmd2, intern=TRUE, param = param), error = function(e) e)
+              setwd(medwd)
+              if(is(res, "error") || (!is.null(attr(res, "status")) && attr(res, "status") > 0))
+              {
+                logfun(param)(name, paste("Failed to check out package source using command:", cmd2),
+                              type="both")
+                logfun(param)(name, res, type="error")
+                return(FALSE)
+              }
+              
               logfun(param)(name, paste0("Successfully checked out package source from ",
                                         sdir, " on branch ", branch(source)))
           }
@@ -132,7 +146,7 @@ setMethod("makePkgDir", c(name = "ANY", source = "GitSource"),
           {
               logfun(param)(name, paste("Temporary source directory successfully created:", ret))
           } 
-              
+          
           ret
       })
 ##stub for everyone else
@@ -162,7 +176,7 @@ setMethod("makePkgDir", c(name="ANY", source="CRANSource"), function(name, sourc
 
 setMethod("makePkgDir", c(name="ANY", source="BiocSource"), function(name, source, path, latest_only, param, forceRefresh = FALSE) {
 
-    if(!requireNamespace("BiocInstaller", quietly=TRUE))
+    if(!requireNamespace2("BiocInstaller", quietly=TRUE))
         stop("Can't handle BiocSource without BiocInstaller installed")
     if(!file.exists(file.path(path, name)))
         dir.create(file.path(path, name), recursive=TRUE)
@@ -202,14 +216,13 @@ setMethod("makePkgDir", c(name = "ANY", source = "TarballSource"),
 
 setMethod("makePkgDir", c(name="ANY",source="LocalSource"),
           function(name, source, path,  latest_only, param, forceRefresh = FALSE) {
-    oldwd = getwd()
-    on.exit(setwd(oldwd))
+
     if(file.exists(file.path(path, name)))
         unlink(file.path(path, name), recursive=TRUE, force=TRUE)
     if(!file.exists(path))
         dir.create(path, recursive = TRUE)
-    setwd(path)
-
+    oldwd = setwd(path)
+    on.exit(setwd(oldwd))
         
     if(missing(name))
         name = basename(location(source))

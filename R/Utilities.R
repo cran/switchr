@@ -1,5 +1,5 @@
 url.exists = function(x, ...) {
-    if(requireNamespace("RCurl"))
+    if(requireNamespace2("RCurl"))
         RCurl::url.exists(x, ...)
     else {
         con = url(x)
@@ -109,11 +109,10 @@ checkIsPkgDir = function (dir)
 ##' @param rootdir The directory of the checkout
 ##' @param branch The branch to navigate to
 ##' @param subdir The subdirectory to navigate to
-##' @param repo a GRANRepository object
 ##' @param param a SwitchrParam object
 ##' @return A path to the Package sources
 ##' @export
-findPkgDir = function(rootdir, branch, subdir, repo, param)
+findPkgDir = function(rootdir, branch, subdir,param)
 {
 
     if(!length(subdir))
@@ -129,15 +128,20 @@ findPkgDir = function(rootdir, branch, subdir, repo, param)
         } else {
             ret = file.path(rootdir, "branches", branch)
         }
-    } else if(is.null(branch) || branch %in% c("master", "trunk")) {
+    } else if(file.exists(file.path(rootdir, ".git"))) {
+        if(is.null(branch) || branch == "trunk")
+            branch = "master"
+        gitChangeBranch(rootdir, branch, param = param)
+        ret = rootdir
+    } else if ( is.null(branch) || branch %in% c("master", "trunk")) {
         ret = rootdir
     } else {
         warning(paste0("The svn repository at ", rootdir,
                        " does not appear to have branches. ",
                        "Unable to process this source."))
-        logfun(param)(name, paste("The SVN repository does not appear to have",
-                                 "branches and a non-trunk/non-master branch",
-                                 "was selected"),  type="both")
+        logfun(param)(name, paste("The SCM repository does not appear to have",
+                                  "branches and a non-trunk/non-master branch",
+                                  "was selected"),  type="both")
         return(NULL)
     }
 
@@ -259,7 +263,8 @@ getPkgDir = function(basepath,name,  subdir, scm_type, branch)
     if(!file.exists(file.path(basepath, name)))
         stop("directory not found")
     ##svn
-    if(file.exists(file.path(basepath, name, ".svn")))
+##    if(file.exists(file.path(basepath, name, ".svn")))
+    if(scm_type == "svn")
     {
         if(checkStdSVN(file.path(basepath, name)))
         {
@@ -288,13 +293,14 @@ getPkgDir = function(basepath,name,  subdir, scm_type, branch)
 ##' be resolved to their physical locations? (FALSE)
 ##' @param winslash The value of winslash to be passed down to normalizePath
 ##' on windows systems
+##' @param mustWork logical. Passed to normalizePath on windows. Ignored otherwise.
 ##' @return The normalized path.
 ##' @export
-normalizePath2 = function(path, follow.symlinks=FALSE, winslash = "\\")
+normalizePath2 = function(path, follow.symlinks=FALSE, winslash = "\\", mustWork = NA)
     {
         
         if(follow.symlinks || Sys.info()["sysname"]=="Windows")
-            return(normalizePath(path, winslash = winslash))
+            return(normalizePath(path, winslash = winslash, mustWork = mustWork))
         else {
             if(substr(path, 1, 1) == "~")
                 path = path.expand(path)
@@ -345,18 +351,32 @@ normalizePath2 = function(path, follow.symlinks=FALSE, winslash = "\\")
 system_w_init = function(cmd, dir,
     init = character(), ..., param = SwitchrParam())
 {
+    pause = shell_timing(param) > 0
+
+    if(!(pause||isWindows()) && length(cmd) > 1)
+        cmd = paste(cmd, collapse=" ; ")
+    
     if(!length(init) && !is.null(param))
         init = sh_init_script(param)
-    if(length(cmd) > 1)
-        stop("cmd should be of length 1")
-    if(length(init) && nchar(init))
-        cmd = paste(paste("source", init), cmd, sep = " ; ")
+    if(length(init) && nchar(init)) 
+        cmd = paste(paste("source", init, ";"), cmd)
+    
     if(!missing(dir)) {
       oldwd  = getwd()
       setwd(dir)
       on.exit(setwd(oldwd))
     }
-    system(cmd, ...)
+    if(length(cmd) > 1) {
+        res = sapply(cmd, function(x, ...) {
+                         res = system(x, ...)
+                         Sys.sleep(shell_timing(param))
+                         res
+                     }, ...)
+        
+        tail(res, 1)
+    } else {
+        system(cmd, ...)
+    }
 }
 
 highestVs = c(9, 14, 2)
@@ -392,7 +412,7 @@ decrBiocRepo = function(repos, vers = biocVersFromRepo(repos)) {
 biocVersFromRepo = function(repos) gsub(".*/([0-9][^/]*)/.*", "\\1", repos[1])
 
 biocReposFromVers = function(vers = develVers) {
-    if(!requireNamespace("BiocInstaller"))
+    if(!requireNamespace2("BiocInstaller"))
         stop("Unable to manipulate bioc versions without BiocInstaller installed")
    
     repos = head(BiocInstaller::biocinstallRepos(), -1)
@@ -400,8 +420,9 @@ biocReposFromVers = function(vers = develVers) {
     af = gsub(".*/[0-9][^/]*(/.*)", "\\1", repos)
     paste0(bef, vers, af)
 }    
+
 highestBiocVers = function(repos){
-    if(!requireNamespace("BiocInstaller"))
+    if(!requireNamespace2("BiocInstaller"))
         stop("Unable to determine bioc versions without BiocInstaller installed")
     else if(missing(repos))
         ## head -1 removes the last element
@@ -429,3 +450,36 @@ errorOrNonZero = function(out)
         FALSE
 }
 
+
+## NB this will give different behavior in R versions that
+## provide requireNamespace and thsoe that don't re the search path.
+## Not ideal, but otherwise switchr will fail to install at all.
+requireNamespace2 = function(...) {
+    if(exists("requireNamespace"))
+        requireNamespace(...)
+    else
+        require(...)
+}
+
+## this will give identical behavior but will be less efficient
+## when paste0 doesn't exist.
+if(!exists("paste0"))
+    paste0 = function(...) paste(..., sep="")
+        
+
+sourceFromManifest = function(pkg, manifest, scm_auths = list(bioconductor=c("readonly", "readonly")), ...) {
+    mandf = manifest_df(manifest)
+    manrow = mandf[mandf$name == pkg, ]
+    ##https://github.com/gmbecker/ProteinVis/archive/IndelsOverlay.zip
+    ## for IndelsOverlay branch
+    src = makeSource(name = pkg,
+        type = manrow$type,
+        url = manrow$url, branch = manrow$branch,
+        subdir = manrow$subdir,
+        scm_auth = scm_auths,...)
+    src
+}
+
+isWindows = function() {
+  Sys.info()["sysname"] == "Windows"
+}

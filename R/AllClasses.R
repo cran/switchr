@@ -6,7 +6,8 @@ setOldClass("sessionInfo")
 ##' @export
 setClass("SwitchrParam", representation(logfun = "function", shell_init = "character",
                                         archive_timing="numeric", archive_retries="numeric",
-                                        dl_method = "character"),
+                                        dl_method = "character",
+                                        shell_timing = "numeric"),
          prototype = prototype(logfun = message, shell_init = "", archive_timing = 2, archive_retries = 2,
                           dl_method = "auto"))
 
@@ -141,7 +142,7 @@ PkgManifest = function(manifest = ManifestRow(...), dep_repos = defaultRepos(), 
         if(url.exists(manifest)) {
             fil = tempfile()
             if(missing(dl_method)) {
-                if(requireNamespace("RCurl"))
+                if(requireNamespace2("RCurl"))
                     dl_meth = "curl"
                 else
                     dl_meth = "auto"

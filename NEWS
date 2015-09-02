@@ -35,3 +35,37 @@ Bugfixes
 	* Fix regression(?) where specifying a SessionManifest seed for an existing library would force it to rebuild and reinstall everything in the seed.
 	* Calling switchTo with a seed for  library that already exists now invokes a message rather than a warning
 	* We now import symbols from base packages (other than base) as per new R CMD check requirements.
+Changes in version 0.9.11 (2015-07-06)
+Miscellaneous
+	* We no longer use tools::package_dependencies to determine depedencies because it is relatively new and prevents switchr from installing in older Rs.
+Changes in version 0.9.12 (2015-07-06)
+Bugfixes
+	* Fix regression in publishManifest resulting in files which contain only the header comments
+Miscellaneous
+	* Remove unnecessary usage of globalVariable to increase compatability with old R versions
+	* Add requireNamespace2 for backwards compatability with old Rs, switch to using that throughout package
+	* Add alternative definition of paste0 for backwards compatability with Rs old enough not to have it.
+Changes in version 0.9.13 (2015-15-07)
+Bugfixes
+	* refine how git existing git checkouts are updated. 
+	* Add testing of git-based makePkgDir and updateGit functions
+Changes to version 0.9.14 (2015-16-07)
+Bugfixes
+	* further iteration on how git checkouts are updated.
+Changes to version 0.9.16 (2015-28-07)
+Bugfixes
+	* fix typo in git command
+	* findPkgDir no longer takes a repo argument, which was unused. 
+New Features
+	* Add shell_timing slot to SwitchrParam, and add accessor
+	* Use shell_timing to split git commands
+	* add experimental makePkgCheckout function
+Changes to version 0.9.17 (2015-29-07)
+Bugfixes
+	* fix problems related to git checkouts that were breaking tests (and functionality) in Windows
+Minor API Changes
+        * Add mustWork argument to normalizePath2, passthrough on Windows
+Changes to version 0.9.18 (2015-04-08)
+Bugfixes
+	* fix dependencies test.
+	* fix documentation

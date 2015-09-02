@@ -32,7 +32,14 @@ switchBack()
 
 
 ###################################################
-### code chunk number 5: switchrvign.Rnw:120-124
+### code chunk number 5: switchrvign.Rnw:104-106 (eval = FALSE)
+###################################################
+## ### Not Run
+## removeLib("mylibrary")
+
+
+###################################################
+### code chunk number 6: switchrvign.Rnw:125-129
 ###################################################
 man = PkgManifest(name = "fastdigest", 
     url = "https://github.com/gmbecker/fastdigest",
@@ -41,7 +48,7 @@ man
 
 
 ###################################################
-### code chunk number 6: switchrvign.Rnw:131-134
+### code chunk number 7: switchrvign.Rnw:136-139
 ###################################################
 man2 = GithubManifest("gmbecker/fastdigest", 
      "gmbecker/RCacheSuite")
@@ -49,7 +56,7 @@ man2
 
 
 ###################################################
-### code chunk number 7: switchrvign.Rnw:145-148
+### code chunk number 8: switchrvign.Rnw:150-153
 ###################################################
 man3 = GithubManifest(redland = "ropensci/redland-bindings/R/redland")
 man
@@ -57,28 +64,28 @@ man
 
 
 ###################################################
-### code chunk number 8: switchrvign.Rnw:157-159
+### code chunk number 9: switchrvign.Rnw:162-164
 ###################################################
 lman = libManifest()
 lman
 
 
 ###################################################
-### code chunk number 9: switchrvign.Rnw:173-175 (eval = FALSE)
+### code chunk number 10: switchrvign.Rnw:178-180 (eval = FALSE)
 ###################################################
 ## ## NOT RUN
 ## switchTo("vign2", seed = lman)
 
 
 ###################################################
-### code chunk number 10: switchrvign.Rnw:193-195 (eval = FALSE)
+### code chunk number 11: switchrvign.Rnw:198-200 (eval = FALSE)
 ###################################################
 ## ## NOT RUN
 ## install_packages("RCacheSuite", man2)
 
 
 ###################################################
-### code chunk number 11: switchrvign.Rnw:201-206 (eval = FALSE)
+### code chunk number 12: switchrvign.Rnw:206-211 (eval = FALSE)
 ###################################################
 ## ## NOT RUN
 ## install_packages("fastdigest", 
@@ -88,37 +95,35 @@ lman
 
 
 ###################################################
-### code chunk number 12: switchrvign.Rnw:231-233
+### code chunk number 13: switchrvign.Rnw:236-238
 ###################################################
 oldman = cranPkgVersManifest(pkg = "randomForest", vers = "4.6-5")
 oldman
 
 
 ###################################################
-### code chunk number 13: switchrvign.Rnw:242-243
+### code chunk number 14: switchrvign.Rnw:247-248
 ###################################################
 manifest_df(oldman)$url
 
 
 ###################################################
-### code chunk number 14: switchrvign.Rnw:252-254
+### code chunk number 15: switchrvign.Rnw:257-259
 ###################################################
 oldman2 = rVersionManifest("3.1.1")
 oldman2
 
 
 ###################################################
-### code chunk number 15: switchrvign.Rnw:261-262
+### code chunk number 16: switchrvign.Rnw:266-267
 ###################################################
 head(manifest_df(oldman2)$url)
 
 
 ###################################################
-### code chunk number 16: switchrvign.Rnw:277-281 (eval = FALSE)
+### code chunk number 17: switchrvign.Rnw:280-282 (eval = FALSE)
 ###################################################
 ## ## NOT RUN
-## switchrDontUnload(c("knitr", "evaluate", "digest", "formatR", "highr", 
-##                     "markdown", "stringr"))
-## 
+## switchrNoUnload(TRUE)
 
 
