@@ -483,3 +483,13 @@ sourceFromManifest = function(pkg, manifest, scm_auths = list(bioconductor=c("re
 isWindows = function() {
   Sys.info()["sysname"] == "Windows"
 }
+
+haveGit = function() {
+    res = tryCatch(system2("git", args = "--version"), error = function(e) e)
+    st = attr(res, "status")
+    if(is(res, "error") || (!is.null(st) && st > 0))
+        FALSE
+    else
+        TRUE
+    
+}

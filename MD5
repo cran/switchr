@@ -1,12 +1,12 @@
-3ad873bcdd125acd8716cc505185b971 *DESCRIPTION
+144e4dab7969b2509fba1df446c6a445 *DESCRIPTION
 5fd0e9914e52c626558a0ed464ede06b *NAMESPACE
-c173dd8f5f7bf3f5569956829cb3014f *NEWS
+55f5eb9a852a2c2f1f405192ec338776 *NEWS
 0bd0d0a1f5fee62eedfba60e16f96886 *R/AllClasses.R
 9c644319def986485a4c08a6c56544a5 *R/GitFunctions.R
 6b7e4ed99a2e434cea56bc6cd54b513b *R/Install.R
 deced12ca4927a5d149af492224dc54c *R/SVNFunctions.R
 67eaa1f0f88706be8b2e7bf4ef2d2195 *R/SwitchrParam.R
-12c026e501ab3e2158c668e11c30e2a4 *R/Utilities.R
+42da790f618ea384ad619fda5ad20ef0 *R/Utilities.R
 a09cb67132c2cf084d201036a6582f78 *R/accessors.R
 5b9fec687cc45deb38e249ebdaee921b *R/allGenerics.R
 7d20791be4f1475cfb07f71e77cfce20 *R/annotateDESCs.R
@@ -26,7 +26,7 @@ e266e1c0066cff0388f53a43760d5688 *R/loadGRAN.R
 f41a10677388af728ca5d742293e1d3b *R/makeCheckout.R
 9e5afc487cc5f494d083c9f1b0fc631a *R/makeLibraryCtx.R
 cd530fe19eecb9af066fd7cdaef85010 *R/makePkgSourceDir-methods.R
-6f04ea2e2149083aff53615b13f8efae *R/manifest.R
+4d6aac891fdca9ef6e0f66a9024b2895 *R/manifest.R
 4a3835767f73189cec31118763ac96db *R/manifestFromLib.R
 b0621adbbfe695fa3ad050f9258e1c95 *R/methods.R
 b42b2ee084d47786c073d536843c0f6f *R/profile.R
@@ -39,7 +39,7 @@ afceb6bf2134b019eb74bbffb26d40ee *README.md
 d385ba6d7240b88b458ad83caee300f6 *build/vignette.rds
 5f9b16ede8a76fca3f256b8f1def1039 *inst/doc/switchrvign.R
 7d731db980f041406c49e6cfda0e3558 *inst/doc/switchrvign.Rnw
-34497087ec66aad5bcd8b7216ce269bf *inst/doc/switchrvign.pdf
+8aaaf92c12c499c4f65c35dd240cc924 *inst/doc/switchrvign.pdf
 04a841f23adfeec02a2613b2211b5f0d *inst/examples/crandb.R
 3eba8544a5c88ffbd0a2e76000fdf831 *inst/examples/lazyRepo.R
 c03b923438104de6322f8bdc9ccbc3ae *inst/examples/localcheckout.R
@@ -137,5 +137,5 @@ ac6fbddadb1e972fdf13de0429e72244 *man/switchrNoUnload.Rd
 8d45f081a1dc16ad80014b70be024ca3 *man/system_w_init.Rd
 e87b4d7eabd96be1a34ec293b3e83b31 *man/updateManifest.Rd
 d90bb9363a7e1f4083e1547dcd614622 *man/versions.Rd
-ef3fc6e794b89f12477360cfad6d7f99 *tests/winpath.R
+a9a9487e3620af3541e70024a36d48a1 *tests/winpath.R
 7d731db980f041406c49e6cfda0e3558 *vignettes/switchrvign.Rnw
