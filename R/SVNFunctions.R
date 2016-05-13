@@ -3,24 +3,32 @@ updateSVN = function(dir, source,  param)
     oldwd = getwd()
     setwd(dir)
     on.exit(setwd(oldwd))
-    usr = pwd = character()
-    if(!is.na(source@user) && nchar(source@user))
-        usr = paste0(" --username=", source@user)
+    usr = pwd = args = character()
     ## if(nchar(source@password))
-    if(!is.na(source@password) && nchar(source@password))
+    if(length(source@password)>0 && !is.na(source@password) && nchar(source@password))
         pwd = source@password
+
+    if(length(source@user)> 0 && !is.na(source@user) && nzchar(source@user))
+        usr = source@user
+    else if(length(pwd) > 0 && nzchar(pwd) && !is.na(pwd))
+        usr = system2("whoami", stdout = TRUE, stderr = TRUE)
     
     if(is(source, "GitSVNSource"))
         {
             if(length(pwd) && nchar(pwd))
-                pwd = paste("echo", pwd, "| ")
-            cmd = paste(pwd,"git svn rebase", usr)
+                pwd = shQuote(paste("echo", pwd, "| "))
+            cmd = paste(pwd,"git")
+            args = c("svn rebase", usr)
         } else {
-            if(length(pwd) && nchar(pwd) )
-                pwd = paste0("--password=", pwd)
-            cmd = paste("svn update", usr, pwd)
+            args = c("update", args)
+            cmd = "svn"
+            if(length(pwd) && nzchar(pwd) )
+                args = c(args, paste0("--password=", pwd))
+            if(length(usr) && nzchar(usr))
+                args = c(args, paste0("--username=", usr))
         }
-    out = tryCatch(system_w_init(cmd, intern=TRUE, param = param),
+   
+    out = tryCatch(system_w_init(cmd, args = args, intern=TRUE, param = param),
         error = function(x) x)
     if(is(out, "error"))
     {

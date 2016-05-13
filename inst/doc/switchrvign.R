@@ -64,10 +64,10 @@ man
 
 
 ###################################################
-### code chunk number 9: switchrvign.Rnw:162-164
+### code chunk number 9: switchrvign.Rnw:162-164 (eval = FALSE)
 ###################################################
-lman = libManifest()
-lman
+## ## NOT RUN due to peculiarities of CRAN build system wrt installed.packages()
+## lman = libManifest()
 
 
 ###################################################

@@ -86,15 +86,15 @@ fileFromBuiltPkg = function(archive, files, ...) {
 }
 
 
-##' R executable
-##' @param cmd the R CMD to run. "build", "check", "INSTALL", or "" (for none)
-##' @param options The options to pass to the command
-##' @export
-Rcmd = function(cmd = c("build", "check", "INSTALL", ""), options) {
-  cmd = match.arg(arg=cmd)
-  cmdpart = if(nchar(cmd)) paste("CMD", cmd) else ""
-	paste(file.path(R.home("bin"), "R"), cmdpart,  options)
-}
+## ##' R executable
+## ##' @param cmd the R CMD to run. "build", "check", "INSTALL", or "" (for none)
+## ##' @param options The options to pass to the command
+## ##' @export
+## Rcmd2 = function(cmd = c("build", "check", "INSTALL"), options="") {
+##     cmd = match.arg(arg=cmd)
+##     cmdpart = if(nchar(cmd)) paste("CMD", cmd) else ""
+##     paste(file.path(R.home("bin"), "R"), cmdpart,  options)
+## }
 
 ##'Check if a directory contains package sources
 ##' @param dir The directory
@@ -342,6 +342,8 @@ normalizePath2 = function(path, follow.symlinks=FALSE, winslash = "\\", mustWork
 ##' but will be changed back upon exit of system_w_init.
 ##' @param init (optional) a character value indicating the
 ##' location of an initialization shell script.
+##' @param args character. Arguments to be passed to the command
+##' @param env character. Environmental variables to be set when running the command
 ##' @param \dots additional parameters passed directly to \code{\link{system}}.
 ##' @param param A SwitchrParam object. The shell initialization
 ##' script associated with this object is used when \code{init} is
@@ -349,35 +351,38 @@ normalizePath2 = function(path, follow.symlinks=FALSE, winslash = "\\", mustWork
 ##' @return Depends, see \code{\link{system}} for details.
 ##' @export
 system_w_init = function(cmd, dir,
-    init = character(), ..., param = SwitchrParam())
+    init = character(), args = NULL, env = NULL, ..., param = SwitchrParam())
 {
     pause = shell_timing(param) > 0
 
-    if(!(pause||isWindows()) && length(cmd) > 1)
-        cmd = paste(cmd, collapse=" ; ")
+    if(length(cmd) > 1)
+        stop("Vectors of commands not supported by system_w_init")
+    
     
     if(!length(init) && !is.null(param))
         init = sh_init_script(param)
-    if(length(init) && nchar(init)) 
-        cmd = paste(paste("source", init, ";"), cmd)
+
+    ## hacky barebones  recreation of system2
+    
+    if(isWindows())
+        cmd = paste( c(shQuote(cmd), env, args), collapse = " ")
+    else
+        cmd = paste( c(env, shQuote(cmd), args), collapse = " ")
+    
+    
+    if(length(init) && nchar(init))         
+        paste(shQuote(paste("source", init, ";")), cmd)
     
     if(!missing(dir)) {
-      oldwd  = getwd()
-      setwd(dir)
-      on.exit(setwd(oldwd))
+        oldwd  = getwd()
+        setwd(dir)
+        on.exit(setwd(oldwd))
     }
-    if(length(cmd) > 1) {
-        res = sapply(cmd, function(x, ...) {
-                         res = system(x, ...)
-                         Sys.sleep(shell_timing(param))
-                         res
-                     }, ...)
-        
-        tail(res, 1)
-    } else {
-        system(cmd, ...)
-    }
+    system(cmd, ...)
 }
+
+    
+
 
 highestVs = c(9, 14, 2)
 
@@ -470,6 +475,9 @@ if(!exists("paste0"))
 sourceFromManifest = function(pkg, manifest, scm_auths = list(bioconductor=c("readonly", "readonly")), ...) {
     mandf = manifest_df(manifest)
     manrow = mandf[mandf$name == pkg, ]
+    if(nrow(manrow) == 0)
+        return(NULL)
+    manrow = manrow[1,]
     ##https://github.com/gmbecker/ProteinVis/archive/IndelsOverlay.zip
     ## for IndelsOverlay branch
     src = makeSource(name = pkg,
@@ -484,12 +492,48 @@ isWindows = function() {
   Sys.info()["sysname"] == "Windows"
 }
 
-haveGit = function() {
-    res = tryCatch(system2("git", args = "--version"), error = function(e) e)
-    st = attr(res, "status")
-    if(is(res, "error") || (!is.null(st) && st > 0))
-        FALSE
-    else
-        TRUE
-    
+haveGit = function() nchar(Sys.which("git")) > 0
+
+haveSVN = function() nchar(Sys.which("svn")) > 0
+
+download.file2 = function(url, destfile, method, ...) {
+    if(missing(method)) {
+        lc = capabilities("libcurl")
+        if(length(lc) && lc)
+            method = "libcurl"
+        else if(nchar(Sys.which("wget")) > 0)
+            method = "wget"
+        else if(nchar(Sys.which("curl")) > 0)
+            method = "curl"
+        else
+            method = "auto"
+    }
+
+    download.file(url, destfile, method, ...)
 }
+
+
+
+download.packages2 = function(pkgs, destdir, avail = NULL,
+                              repos = getOption("repos"),
+                              contrib = contrib.url(repos, type),
+                              method, type = getOption("pkgType"),
+                              ...) {
+    if(missing(method)) {
+        lc = capabilities("libcurl")
+        if(length(lc) && lc)
+            method = "libcurl"
+        else if(nchar(Sys.which("wget")) > 0)
+            method = "wget"
+        else if(nchar(Sys.which("curl")) > 0)
+            method = "curl"
+        else
+            method = "auto"
+    }
+
+    download.packages(pkgs = pkgs, destdir = destdir, available = avail,
+                  repos = repos, contriburl = contrib,
+                  method = method, type=type, ...)
+}
+
+

@@ -176,9 +176,11 @@ setMethod("lazyRepo", c(pkgs = "character", pkg_manifest = "PkgManifest"),
                       if(file.info(pkgfile)$isdir)
                           desc = file.path(pkgfile, subdir(src),"DESCRIPTION")
                       else {
-                          
-                          succ= fileFromBuiltPkg(pkgfile, files = .descInTB(src),
-                              exdir = tempdir())
+                          ## this was getting hit and "built" later but only had the
+                          ## DESCRIPTION file in it. Best to just untar the whole thing
+                          ## succ= fileFromBuiltPkg(pkgfile, files = .descInTB(src),
+                          ##     exdir = file.path(tempdir())
+                          succ = untar(pkgfile, exdir = tmpdir)
                           if(!succ)
                               desc = file.path(tmpdir, pkgname, subdir(src),"DESCRIPTION")
                           else
@@ -233,9 +235,10 @@ setMethod("lazyRepo", c(pkgs = "character", pkg_manifest = "PkgManifest"),
                   if(length(list.files(repdir, pattern = tballpat)) == 0) {
                       if(verbose)
                           message(sprintf("Building package %s", pkgname))
-                      cmd = paste(Rcmd("build", paste("--no-resave-data --no-build-vignettes", 
-                                                  file.path(pkgdir, subdir(src)))))
-                      res = tryCatch(system_w_init(cmd, dir = repdir, intern=TRUE, param = param),
+                      args = c("build", "--no-resave-data", "--no-build-vignettes", file.path(pkgdir, subdir(src)))
+                      res = tryCatch(system_w_init(paste(R.home("bin"), "Rcmd", sep="/"), args = args,
+                                                   dir = repdir, intern=TRUE,
+                                                   param = param),
                         error = function(x) x)
                   if(is(res, "error"))
                       stop(paste("Unable to build package", res))

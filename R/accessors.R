@@ -1,5 +1,7 @@
 
-##' Get or set the number of seconds to wait after trying to
+##' @title archive_timing
+##' 
+##' @description Get or set the number of seconds to wait after trying to
 ##' retrieve a file from the CRAN Archive.
 ##'
 ##' This is intended to stop intermittent install failures
@@ -36,9 +38,9 @@ setMethod("archive_timing<-", "SwitchrParam", function(x, value) {
 
 
 
-##' Get or set the number of seconds to wait between successive shell commands
+##' @title Get or set the number of seconds to wait between successive shell commands
 ##'
-##' This is intended to stop intermittent install failures
+##' @description This is intended to stop intermittent install failures
 ##' due to network drive latency interacting with git commands
 ##'
 ##' @param x A SwitchrParam object
@@ -450,6 +452,45 @@ setMethod("logfun<-", "SwitchrParam", function(x, value) {
 
 
 
+## @title Add/replace rows in a data.frame
+## 
+## Combine two dataframes together with rows in one optionally replacing
+## those in the other when they match on a specified index column
+##
+## @param df data.frame. The "first" or "old" data.frame.
+## @param newdf data.frame. The "new" data frame of rows to add to \code{df}
+## @param replace logical. Should replacement happen when rows of \code{df} and
+## \code{newdf} match based on \code{indexcol}. Defaults to \code{TRUE}. If
+## \code{FALSE}, an error is thrown in the matching case.
+## @param indexcol character. The name of the column to use for matching.
+## Defaults to \code{"name"} for convenience of internal usage.
+##
+## @return A combined data.frame with only columns found in both data.frames
+## and one row per unique value of the specified index column across both
+## datasets.
+addReplaceDF = function(df, newdf, replace = TRUE, indexcol = "name") {
+    df = df[,intersect(names(df), names(newdf))]
+    newdf = newdf[,intersect(names(df), names(newdf))]
+    oldvec = df[[indexcol]]
+    newvec = newdf[[indexcol]]
+    dups = oldvec[oldvec %in% newvec]
+    if(length(dups)) {
+        if(!replace)
+            stop("Values in new rows already appear in existing rows, set replace=TRUE to replace them inplace. [",
+                 paste(dups, collapse=", "),
+                 "]")
+        
+        dupdf = newdf[newvec %in% dups,]
+        newdf = newdf[!newvec %in% dups,]
+        df[match(dupdf[[indexcol]], oldvec),] = dupdf
+    }
+    
+    rbind(df, newdf)
+}
+
+
+
+
 ##' Add a package to an object associated with a manifest
 ##' @export
 ##' @rdname addPkg
@@ -458,38 +499,53 @@ setMethod("logfun<-", "SwitchrParam", function(x, value) {
 ##' @param rows An already-created data.frame to add to the manifest
 ##' @param versions A data.frame of package names and versions, if adding to
 ##' a SessionManifest, ignored otherwise
+##' @param replace logical. If true, the specified package info will replace
+##' any already in the manifest in the case of duplicates. Otherwise, an error
+##' is thrown.
 ##' @docType methods
 setGeneric("addPkg", function(x, ..., rows = makeManifest(...),
                               versions = data.frame(name = manifest_df(rows)$name,
                                   version = NA_character_,
-                                  stringsAsFactors=FALSE))
+                                  stringsAsFactors=FALSE),
+                              replace = FALSE)
            standardGeneric("addPkg")
            )
 ##' @rdname addPkg
 ##' @aliases addPkg,PkgManifest
 setMethod("addPkg", "PkgManifest",
-          function(x, ..., rows= makeManifest(...), versions) {
+          function(x, ..., rows= makeManifest(...), versions, replace) {
               oldman = manifest_df(x)
               newman = manifest_df(rows)
-              oldman = oldman[,names(newman)]
-              manifest_df(x) = rbind(oldman, newman)
+              ## oldman = oldman[,names(newman)]
+              ## dups = oldman$name[oldman$name %in% newman$name]
+              ## if(length(dups)) {
+              ##     if(!replace)
+              ##         stop("Attempted to add package(s) already in manifest with replace=FALSE:  ",
+              ##              paste(dups, collapse=", "))
+              ##     dupman = newman[newman$name %in% dups,]
+              ##     newman = newman[!newman$name %in% dups,]
+              ##     oldman[match(newman$name, oldman$name),] = newman
+              ## }
+              ## manifest_df(x) = rbind(oldman, newman)
+              manifest_df(x) = addReplaceDF(oldman, newman, replace= replace)
               dep_repos = unique(c(dep_repos(x), dep_repos(rows)))
               x
           })
 ##' @rdname addPkg
 ##' @aliases addPkg,SessionManifest
 setMethod("addPkg", "SessionManifest",
-          function(x, ..., rows, versions) {
-              manifest(x) = addPkg(manifest(x), ..., rows = rows, versions = NULL)
+          function(x, ..., rows, versions, replace) {
+              manifest(x) = addPkg(manifest(x), ..., rows = rows, versions = NULL,
+                                   replace = replace)
               if(!missing(versions) && length(versions) > 0) {
                   if(is(versions, "character"))
                       versions = data.frame(name = names(versions),
                           version = versions, stringsAsFactors = FALSE)
-                  if(any(versions$name %in% versions_df(x)$name))
-                      stop("Version already set for one or more packages")
+                  
                   oldv = versions_df(x)
-                  versions = versions[,names(oldv)]
-                  versions_df(x) = rbind(oldv, versions)
+                  ## versions = versions[,names(oldv)]
+                  ## versions_df(x) = rbind(oldv, versions)
+                  versions_df(x) = addReplaceDF(oldv, versions, replace = replace)
               }
               x
           })
@@ -571,3 +627,23 @@ setGeneric("notrack", function(repo) standardGeneric("notrack"))
 ##' @rdname notrack
 ##' @aliases notrack,NULL
 setMethod("notrack", "NULL", function(repo) file.path(tempdir(), "notrack"))
+
+
+##' @description Number of rows
+##'
+##' @title Number of rows
+##'
+##' @param x A tabular data structure.
+##' @return The number of rows in the structure
+##' @docType methods
+##' @export
+##' @rdname nrow
+setGeneric("nrow", nrow)
+##' @rdname nrow
+##' @aliases nrow,PkgManifest
+setMethod("nrow", "PkgManifest",
+          function(x) base::nrow(manifest_df(x)))
+##' @rdname nrow
+##' @aliases nrow,SessionManifest
+setMethod("nrow", "SessionManifest",
+          function(x) base::nrow(manifest_df(x)))

@@ -76,7 +76,7 @@ findPkgVersionInCRAN = function(name, version, param = SwitchrParam(), dir)
     {
         pkg = pkgs[pkgs$Package == name,]
         if(pkg$Version == version){
-            res = download.packages(name, destdir = destpath, type="source")
+            res = download.packages2(name, destdir = destpath, type="source")
             if(nrow(res) < 1)
                 stop("Package is in CRAN but download failed")
             return(res[1,2])
@@ -94,11 +94,12 @@ findPkgVersionInCRAN = function(name, version, param = SwitchrParam(), dir)
     destfile = file.path(destpath, tarname)
     retries = 0
     while(retries < archive_retries(param)) {
-        res = tryCatch(download.file(cranurl, destfile), error = function(e) e)
+        res = tryCatch(download.file2(cranurl, destfile), error = function(e) e)
         Sys.sleep(archive_timing(param))
-        if(is(res, "error") || res > 0) 
+        if(is(res, "error") || res > 0) {
+            retries = retries + 1
             destfile = NULL
-        else
+        } else
             break
     }
     
@@ -228,16 +229,21 @@ findPkgVersionInBioc = function(name, version, param = SwitchrParam(), dir)
             param = param, ret$biocVers)
         if(is.null(commit))
             return(NULL)
+        
         pkgdir = file.path(dir, name)
-        system_w_init(Rcmd("build", paste("--no-build-vignettes --no-resave-data --no-manual",
-                            pkgdir)), param = param)
+        rbin = paste(file.path(R.home("bin"), "Rcmd"))
+        system_w_init(rbin, args = c("build", "--no-build-vignettes", "--no-resave-data", "--no-manual",
+                            pkgdir), param = param)
         ret = normalizePath2(list.files(pattern  = paste0(name, "_", version, ".tar.gz"), full.names=TRUE))
         setwd(pkgdir)
-        system_w_init("svn up", param = param) #this gets us back to the trunk
+        system_w_init("svn", args = "up", param = param) #this gets us back to the trunk
 
     }
     ret
 }
+
+
+
 
 ## tries to download the file. Returns list with two elements (file:dl'ed file or NULL and versionToSearch:bioc version)
 ##' @importFrom utils contrib.url available.packages compareVersion download.file
@@ -254,7 +260,7 @@ findPkgVersionInBioc = function(name, version, param = SwitchrParam(), dir)
         if(verbose)
             message(sprintf("Searching Bioc repository for release %s", biocVersFromRepo(urls)))
         
-        pkgs = as.data.frame(available.packages(urls, fields = c("Package", "Version"), type="source"), stringsAsFactors=FALSE)
+        pkgs = as.data.frame(available.packages(urls, fields = c("Package", "Version"), type="source", filters = "duplicates"), stringsAsFactors=FALSE)
         pkg = pkgs[pkgs$Package == name,]       
         
         pkgAvail = nrow(pkg) > 0
@@ -267,10 +273,9 @@ findPkgVersionInBioc = function(name, version, param = SwitchrParam(), dir)
                     message(sprintf("Bioc repo for release %s has package version %s, earlier than desired version %s", biocVersFromRepo(urls), versAvail, version))
                 pkgAvail = FALSE
             } else if (compareVersion(versAvail, version) == 0) {
-                                        #                ret = download.packages(name, destdir = destpath, repos = urls)[1,2]
                 filname = paste0(name, "_", version, .getExt(pkg[1,"Repository"]))
                 dstfile = file.path(dir, filname)
-                ret = tryCatch(download.file(paste(pkg[1,"Repository"], filname, sep="/"), destfile=dstfile), error=function(x) x)
+                ret = tryCatch(download.file2(paste(pkg[1,"Repository"], filname, sep="/"), destfile=dstfile), error=function(x) x)
                 if(!is(ret, "error") && ret == 0) {
                     ret = dstfile
                     if(verbose)
@@ -303,9 +308,12 @@ findPkgVersionInBioc = function(name, version, param = SwitchrParam(), dir)
 ##' @param name A vector of bioconductor package names The name of the package
 ##' @param biocVers The version (release) of bioconductor, or \code{'trunk'} (the default) for
 ##' Bioc devel.
+##' @param pkgtype character. Which type of packages to retrieve the SVN root url for. Should be
+##' \code{"software"} or \code{"data"} for software and experimental data packages,
+##' respectively.
 ##' @return A vector of urls for the specified packages within the Bioconductor SVN repository
 ##' @export
-makeBiocSVNURL = function(name, biocVers = "devel") {
+makeBiocSVNURL = function(name, biocVers = getBiocvrFromRvr(), pkgtype = "software") {
 
     biocVers = tolower(biocVers)
     if(biocVers == biocVersFromRepo(highestBiocVers()) || biocVers %in% dev_vers_aliases) {
@@ -314,9 +322,18 @@ makeBiocSVNURL = function(name, biocVers = "devel") {
         biocVers = paste("branches/RELEASE", gsub(".", "_", biocVers, fixed=TRUE), sep="_")
     }
 
-    paste0("https://hedgehog.fhcrc.org/bioconductor/", biocVers, "/madman/Rpacks/", name)
+    lowerloc = switch(pkgtype,
+                      software = "bioconductor",
+                      data = "bioc-data",
+                      stop("Unsupported pkgtype"))
+
+    loc = switch(pkgtype,
+                 software = "madman/Rpacks",
+                 data = "experiment/pkgs",
+                 stop("Unsupported pkg type"))
+    paste("https://hedgehog.fhcrc.org", lowerloc, biocVers, loc, name, sep="/")
 }
-    
+
 findBiocSVNRev = function(name, version, destpath, param, biocVers="devel")
 {
  
@@ -329,8 +346,12 @@ findBiocSVNRev = function(name, version, destpath, param, biocVers="devel")
         if(!ret)
             return(NULL)
     }         
-    findSVNRev(name, version, svn_repo = repoloc, pkgpath = pkgdir, param = param)
-
+    res = findSVNRev(name, version, svn_repo = repoloc, pkgpath = pkgdir, param = param)
+    if(is.null(res) && ! biocVers %in% dev_vers_aliases) {
+        trrepo = makeBiocSVNURL(name, "devel") 
+        res = findSVNRev(name, version, svn_repo = trrepo, pkgpath = pkgdir, param = param)
+    }
+    res
 }
 
 ## destpath is the actual package directory, not the general destpath for all pkgs.
@@ -340,23 +361,29 @@ findSVNRev = function(name, version, svn_repo, pkgpath, param) {
     ##setwd(file.path(destpath,  name))
     oldwd = setwd(pkgpath)
     on.exit(setwd(oldwd))
-    system_w_init(paste("svn switch --ignore-ancestry", svn_repo), param = param)
+    system_w_init("svn", args = c("switch", "--ignore-ancestry", svn_repo),
+                        param = param)
 
     
     
     
     cmd0 = "svn log -r 1:HEAD --limit 1 DESCRIPTION"
-    revs = system_w_init(cmd0, intern=TRUE, param = param)
+    revs = system_w_init("svn", args = c("log", "-r 1:HEAD", "--limit 1", "DESCRIPTION"),
+                         intern = TRUE, param = param)
     minrev = as.numeric(gsub("r([[:digit:]]*).*", "\\1", revs[2])) #first line is -------------------
      cmd1 = "svn log -r HEAD:1 --limit 1 DESCRIPTION"
-    revs2 = system_w_init(cmd1, intern=TRUE, param = param)
+    revs2 = system_w_init("svn", args = c("log", "-r HEAD:1", "--limit 1", "DESCRIPTION"),
+                          intern = TRUE, param = param)
     maxrev = as.numeric(gsub("r([[:digit:]]*).*", "\\1", revs2[2]))
     
     currev = floor((maxrev+minrev)/2)
     
     commit = binRevSearch(version, currev = currev, maxrev = maxrev, minrev = minrev, found = FALSE, param = param)
+    if(is.null(commit))
+        return(NULL)
     cmd2 = paste("svn switch --ignore-ancestry -r", commit, svn_repo)#repoloc)
-    system_w_init(cmd2, param = param)
+    system_w_init("svn", args = c("switch", "--ignore-ancestry", paste("-r", commit),
+                                  svn_repo), param = param)
     return(commit)
     }
 
@@ -364,7 +391,9 @@ findSVNRev = function(name, version, svn_repo, pkgpath, param) {
 binRevSearch = function(version, currev, maxrev, minrev, param, found = FALSE)
 {
     cmd = paste("svn diff --revision", paste(currev, maxrev, sep=":"), "DESCRIPTION")
-    revs = tryCatch(system_w_init(cmd, intern=TRUE, param = param), error=function(x) x)
+    revs = tryCatch(system_w_init("svn", args = c("diff", "--revision", paste0(currev, ":", maxrev),
+                                                  "DESCRIPTION"), intern = TRUE,
+                                  param = param), error=function(x) x)
     if(is(revs, "error"))
         return(NULL)
    
@@ -476,7 +505,8 @@ findGitRev = function(pkg, version, codir, param = SwitchrParam()) {
         log("Couldn't find DESCRIPTION file in git checkout")
     oldwd = setwd(codir)
     on.exit(setwd(oldwd))
-    log = system_w_init("git log -p DESCRIPTION", intern = TRUE, param = param)
+    log = system_w_init("git", args = c("log", "-p", " DESCRIPTION"),
+                        intern = TRUE, param = param)
     cpos = grep("commit [[:alnum:]]{40}[[:space:]]*$", log)
     line = grep(paste("\\+[vV]ersion: *", version,"$", sep=""), log)
     if(!length(line)) {
@@ -486,7 +516,8 @@ findGitRev = function(pkg, version, codir, param = SwitchrParam()) {
     cpos = max(cpos[cpos<line])
     sha = gsub("commit ([[:alnum:]]{40})[[:space:]]*$", "\\1", log[cpos])
     cmd = sprintf("git checkout %s", sha)
-    res = tryCatch(system_w_init(cmd, param = param, intern=TRUE), error = function(e) e)
+    res = tryCatch(system_w_init("git", args = c("checkout", sha),
+                                 param = param, intern = TRUE), error = function(e) e)
     if(is(res, "error")) {
         logfun(param)(pkg, sprintf("Found commit for package version but checking out that commit failed, cmd: %s",cmd), type = "both")
         NULL
@@ -496,4 +527,4 @@ findGitRev = function(pkg, version, codir, param = SwitchrParam()) {
 }
 
 
-          
+
