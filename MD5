@@ -1,4 +1,4 @@
-b6186b073b93128807dfc4949b6e83a4 *DESCRIPTION
+0465b5bcd97a987fb7cd3fcbb9ef2455 *DESCRIPTION
 841738fa97623a25d9ac70596e12f6c4 *NAMESPACE
 0f5231319252d24c6da5dd1b7e4e88f9 *NEWS
 c89d3cd10304d77871e30044fba83e9b *R/AllClasses.R
@@ -36,11 +36,11 @@ b2e265eee91b0e1e66a7cc9afb8bdfd6 *R/saveManifest.R
 c5cdadfdaacbc91e72e34d134fe78a3d *R/sessionInfo.R
 fdb15b727481e5b5ca0f2ddda83dc083 *R/show-methods.R
 afceb6bf2134b019eb74bbffb26d40ee *README.md
-2a425589f82ab91ed63486a108c753a9 *build/vignette.rds
+5577b2903b48a4751262f96a2baac91c *build/vignette.rds
 150c713174a09f9b839dfa48f6b60496 *inst/cranarchivetest.R
-958d42d5e50127a17e206769cd6eefd0 *inst/doc/switchrvign.R
-923adf1950d6ec94bcd2003cff763de3 *inst/doc/switchrvign.Rnw
-2cbcce9a146c9fe7458212a72e2b27d5 *inst/doc/switchrvign.pdf
+88a9658eb9a782e51d5c13628f6c0970 *inst/doc/switchrvign.R
+5f0cdad293a37ad023ee0ff803f5f9f7 *inst/doc/switchrvign.Rnw
+649506fd88ed635d20aca806ce8fdcfc *inst/doc/switchrvign.pdf
 04a841f23adfeec02a2613b2211b5f0d *inst/examples/crandb.R
 3eba8544a5c88ffbd0a2e76000fdf831 *inst/examples/lazyRepo.R
 c03b923438104de6322f8bdc9ccbc3ae *inst/examples/localcheckout.R
@@ -142,4 +142,4 @@ b431536d7007a26b1b828bd486cc7aae *man/switchrManifest.Rd
 5b247d78d3c25c2b01c1edd3b3a80a7c *man/updateManifest.Rd
 c800c81c4676278beaa575ef2e8478a1 *man/versions.Rd
 ae89398d47a0bd35744c1aa0a963e606 *tests/winpath.R
-923adf1950d6ec94bcd2003cff763de3 *vignettes/switchrvign.Rnw
+5f0cdad293a37ad023ee0ff803f5f9f7 *vignettes/switchrvign.Rnw

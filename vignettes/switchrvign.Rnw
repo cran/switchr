@@ -45,6 +45,7 @@ used) to a temporary directory.
 <<results=hide,eval=TRUE >>=
 library(switchr)
 switchrBaseDir(file.path(tempdir(), ".switchr"))
+switchrNoUnload(TRUE)
 options(width=40, repos = c(CRAN="http://cran.rstudio.com"))
 @ 
 
@@ -179,9 +180,38 @@ We specify a seed via the \textit{seed} argument to the \texttt{switchTo} functi
 ## NOT RUN
 switchTo("vign2", seed = lman)
 @
+
 The above code will create a new switchr library called vign2 and populate it with
 the package versions listed in lman - i.e., the packages installed in the library
 used to build this vignette.
+
+
+\subsection{Utilizing sessionInfo() output}
+
+\verb@switchr@ also supports using information from \verb@sessionInfo()@
+output at both the seeding and manifest-creation stages.
+
+We can make a \textit{seeding manifest} from the current session info
+by calling the \verb@makeSeedMan@ function with no arguments (or with
+only the \verb@known_manifest@ argument, if applicable):
+
+<<>>=
+makeSeedMan()
+@ 
+
+Given the text output of \verb@sessionInfo@ (likely from a different
+session than the current one), we can also seed a \verb@switchr@
+library with it directly.
+
+<<eval=FALSE>>=
+## NOT RUN for vignette efficiency reasons (avoid installation)
+## sinfo is a character string containing sessionInfo() output
+switchTo("sinfolib", seed = sinfo)
+@ 
+
+Note that the \verb@switchTo@ mechanism can take the full
+\verb@sessionInfo@ output. No preprocessing or subsetting of the
+information is required by the user. 
 
 
 \section{Installing specific packages and package versions}
