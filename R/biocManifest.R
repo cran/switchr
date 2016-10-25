@@ -11,11 +11,10 @@
 ##' set of inter-dependent Bioconductor packages.
 ##' @seealso \code{\link{lazyRepo}}
 ##' @examples
-##' ## not run because it can hang some finnicky build systems
-##' \dontrun{
+##' ## wrapped in try because it fails on some finnicky build systems
 ##' bman = try(BiocSVNManifest())
 ##' bman
-##' 
+##' \dontrun{
 ##' repo = lazyRepo("rtracklayer", bman)
 ##' }
 ##' @export

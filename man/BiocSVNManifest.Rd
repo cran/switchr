@@ -27,11 +27,10 @@ manifest can be used to work from a local, working checkout of a
 set of inter-dependent Bioconductor packages.
 }
 \examples{
-## not run because it can hang some finnicky build systems
-\dontrun{
+## wrapped in try because it fails on some finnicky build systems
 bman = try(BiocSVNManifest())
 bman
-
+\dontrun{
 repo = lazyRepo("rtracklayer", bman)
 }
 }
