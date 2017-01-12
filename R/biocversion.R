@@ -57,6 +57,19 @@ getBiocDevelVr = function() {
     develvr
 }
 
+getBiocReleaseVr = function() {
+    yaml = getBiocYaml()
+    develln = grep("^release_version:",yaml)
+    develvr = gsub('.*:.*"(.*)".*', "\\1", yaml[develln])
+    develvr
+}
+
+## alias to avoid immediate refactor
+## We want the devel version because we want to hit the
+## devel repo, if called for, I think.
+highestBiocVers = function() biocReposFromVers(getBiocDevelVr())
+
+
 develVers = getBiocDevelVr()
 
 isCurrentDevelVr = function(vr, yaml) {

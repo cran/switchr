@@ -151,16 +151,15 @@ setMethod("install_packages", c(pkgs = "character", repos= "PkgManifest"), funct
           })
 
 ## @param man A PkgManifest
-.install_packages = function(pkgs, lazyrepo, man, ...) {
+.install_packages = function(pkgs, lazyrepo, man, type = "source", ...) {
     if ("lib" %in% list(...))
         libloc = list(...)["lib.loc"]
     else
         libloc = .libPaths()[1]
-    if("type" %in% list(...))
-      type = list(...)$type
-    else
-      type = "source"
-    avail1 = available.packages(lazyrepo)
+    if(type != "source")
+        warning("using type other than source is not officially supported with switchr. Use at your own risk")
+    
+    avail1 = available.packages(lazyrepo, type = "source")
     avail2 = available.packages(contrib.url(dep_repos(man), type = type))
     new = !avail2[,"Package"] %in% avail1[,"Package"]
     avail = rbind(avail1, avail2[new,])
@@ -168,7 +167,8 @@ setMethod("install_packages", c(pkgs = "character", repos= "PkgManifest"), funct
     oldpkgs = installed.packages(libloc)[,"Package"]
     oldinfo = lapply(oldpkgs, function(x) file.info(system.file("DESCRIPTION", package = x)))
     
-    utils::install.packages(pkgs, available = avail, repos = unique(c(lazyrepo, contrib.url(dep_repos(man)))), ...)
+    utils::install.packages(pkgs, available = avail, repos = unique(c(lazyrepo, contrib.url(dep_repos(man)))),
+                            type = type, ...)
 
     newpkgs  = installed.packages(libloc)[,"Package"]
 
@@ -184,7 +184,10 @@ setMethod("install_packages", c(pkgs = "character", repos= "PkgManifest"), funct
         installedpkgs = c(newpkgs[newinds], newpkgs[updated])
     } else
         installedpkgs = newpkgs
-    annotateDESCs(installedpkgs, man)
+
+    ## wrap in try so that permission errors don't ill the call entirely, even though
+    ## the important stuff has already happened.
+    try(annotateDESCs(installedpkgs, man))
     installedpkgs
 }
 

@@ -59,7 +59,7 @@ switchrManifest = function() {
     dir = switchrBaseDir()
     manfile = file.path(dir, "manifest.dat")
     
-    if(!file.exists(manfile))
+    if(!file.exists(manfile) || length(readLines(manfile)) == 0)
         data.frame(url = character(), name = character(), libpaths = character(),
                    stringsAsFactors = FALSE, rversion = character())
     else
@@ -73,8 +73,14 @@ switchrManifest = function() {
 ##' metadata cache.
 ##' @importFrom utils write.table
 updateManifest = function() {
-    fils = list.files(switchrBaseDir(), recursive = TRUE, full.names = TRUE, pattern = "lib_info")
+    dirs = list.dirs(switchrBaseDir(), recursive=FALSE)
+    fils = file.path(dirs, "lib_info")
+    fils = fils[file.exists(fils)]
+                     
     man = do.call(rbind.data.frame, lapply(fils, function(x) read.table(x, stringsAsFactors = FALSE, header = TRUE)))
-    write.table(man, file = file.path(switchrBaseDir(), "manifest.dat"))
+    if(nrow(man) > 0)
+        write.table(man, file = file.path(switchrBaseDir(), "manifest.dat"))
+    else
+        file.remove(file.path(switchrBaseDir(), "manifest.dat"))
     NULL
 }
