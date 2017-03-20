@@ -119,7 +119,7 @@ We do this via a generalized form of a package repository called a
 \textit{package manifest}, which includes a listing of packages and the information
 switchr needs to install them (primarily location of their source code).
 
-We can create a package manifest from scratch via the \texttt{PkgManifest} function, though there
+We can create a package manifest from scratch via the \texttt{PkgManifest} function, though there are
 convenience functions for common use-cases such as Github packages
 
 <<>>=
@@ -223,7 +223,7 @@ behave as expected.
 
 \verb@switchr@ does include experimental support for building a
 consistent manifest based on a specific version of a single
-package. This uses Csardi's the database of R package metadata
+package. This uses Csardi's database of R package metadata
 developed for his
 \href{https://github.com/metacran/crandb}{\texttt{crandb}} package.
 
