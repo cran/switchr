@@ -52,6 +52,7 @@ Renvs= new.env()
 ##' switchTo("fastdigestlib", seed = fdman)
 ##' }
 ##' @export
+##' @references Becker G, Barr C, Gentleman R, Lawrence M; Enhancing Reproducibility and Collaboration via Management of R Package Cohorts. Journal of Statistical Software, 81(1). 2017. doi: 10.18637/jss.v082.i01 
 ##' @docType methods
 ##' @rdname switchTo
 setGeneric("switchTo", function(name, seed = NULL, reverting = FALSE,
@@ -136,7 +137,7 @@ setMethod("switchTo", c(name = "character", seed = "character"),
             cenv = makeLibraryCtx(name = name, seed = seed,
                                   exclude.site = exclude.site,  ...)
         } else {
-            message(sprintf("Library %s already exists. Ignoring seed and switching to existing library"), name)
+            message(sprintf("Library %s already exists. Ignoring seed and switching to existing library", name))
         }
     if(!is.null(cenv))
         switchTo(name = cenv)
@@ -198,7 +199,7 @@ setMethod("switchTo", c("character", "missing"),
     cenv = findCompEnv(name = name, rvers = rvers)
 
     if(is.null(cenv))
-        cenv = makeLibraryCtx(name = name, exclude.site = TRUE, ...)
+        cenv = makeLibraryCtx(name = name, exclude.site = exclude.site, ...)
 
 
     if(!is.null(cenv))
@@ -342,17 +343,17 @@ setMethod("switchTo", c("character", seed = "PkgManifest"),
         message("Found existing switchr context. Ignoring seed value")
         return(switchTo(exsting))
     }
-    cenv = makeLibraryCtx(name = name, seed = NULL,
+    cenv = makeLibraryCtx(name = name, seed = seed,
                           exclude.site = exclude.site,
                           ...)
-    oldlp = .libPaths()
-    .libPaths2(library_paths(cenv), cenv@exclude.site)
-    on.exit(.libPaths2(oldlp))
+    ## oldlp = .libPaths()
+    ## .libPaths2(library_paths(cenv), cenv@exclude.site)
+    ## on.exit(.libPaths2(oldlp))
     
-    install_packages(manifest_df(seed)$name, seed, lib = library_paths(cenv)[1])
-              cenv = update_pkgs_list(cenv)
-    .libPaths2(oldlp)
-    on.exit(NULL)
+    ## install_packages(manifest_df(seed)$name, seed, lib = library_paths(cenv)[1])
+    ## cenv = update_pkgs_list(cenv)
+    ## .libPaths2(oldlp)
+    ## on.exit(NULL)
     switchTo(cenv)
 })
 
@@ -373,13 +374,13 @@ setMethod("switchTo", c("character", seed = "SessionManifest"),
         message("Found existing switchr context. Ignoring seed value")
         return(switchTo(exsting))
     }
-    cenv = makeLibraryCtx(name = name, seed = NULL,
+    cenv = makeLibraryCtx(name = name, seed = seed, #NULL,
                           exclude.site = exclude.site,
                           ...)
     
     
     
-    install_packages(pkgs = seed, lib = library_paths(cenv)[1])
+#    install_packages(pkgs = seed, lib = library_paths(cenv)[1])
     cenv = update_pkgs_list(cenv)
     switchTo(cenv)
 })
@@ -407,7 +408,7 @@ setMethod("announce", "SwitchrCtx", function(seed, reverted=FALSE) {
     message(sprintf("%s to the '%s' computing environment. \n%d packages are currently available.", ifelse(reverted, "Reverted", "Switched"),
                     seed@name,  nrow(seed@packages)))
     if(seed@exclude.site)
-        message("Packages installed in your site library ARE suppressed.")
+        message("Packages installed in your site library are suppressed.")
     message("To switch back to your previous environment type switchBack()")
 })
 

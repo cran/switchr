@@ -3,14 +3,14 @@
 \docType{methods}
 \name{lazyRepo}
 \alias{lazyRepo}
-\alias{lazyRepo,PkgManifest,ANY}
-\alias{lazyRepo,PkgManifest,ANY-method}
-\alias{lazyRepo,SessionManifest,ANY}
 \alias{lazyRepo,SessionManifest,ANY-method}
-\alias{lazyRepo,character,PkgManifest}
-\alias{lazyRepo,character,PkgManifest-method}
-\alias{lazyRepo,character,SessionManifest}
+\alias{lazyRepo,SessionManifest,ANY}
+\alias{lazyRepo,PkgManifest,ANY-method}
+\alias{lazyRepo,PkgManifest,ANY}
 \alias{lazyRepo,character,SessionManifest-method}
+\alias{lazyRepo,character,SessionManifest}
+\alias{lazyRepo,character,PkgManifest-method}
+\alias{lazyRepo,character,PkgManifest}
 \title{lazyRepo}
 \usage{
 lazyRepo(pkgs, pkg_manifest, versions = rep(NA, times = length(pkgs)),
@@ -87,7 +87,9 @@ allows the user to have an existing, checkout directory where he or she
 works on development versions of multiple, interrelated packages, as local
 changes WILL be reflected in the packages built into the lazy repository.
 }
+\references{
+Becker G, Barr C, Gentleman R, Lawrence M; Enhancing Reproducibility and Collaboration via Management of R Package Cohorts. Journal of Statistical Software, 81(1). 2017. doi: 10.18637/jss.v082.i01
+}
 \author{
 Gabriel Becker
 }
-

@@ -1,5 +1,24 @@
+## (very far backawards compatible version of list.dirs
+## list.dirs is apparently a relatively new addition, makes this function fail in R 2.12.1
+list.dirs = function(path = ".", full.names = TRUE, recursive = TRUE) {
+    if(exists("list.dirs", where = length(search()))) ##this looks in base pkg
+        dirs = base::list.dirs(path = path, full.names = full.names,
+                         recursive = recursive)
+    else {
+        ## very old versions of list.files don't have include.dirs or no..
+        
+        dirs = list.files(path, recursive = recursive,
+                          full.names = full.names)
+        dirs = dirs[sapply(dirs, function(x) file.info(x)$isdir)]
+    }
+
+    dirs
+}
+
+
 url.exists = function(x, ...) {
-    if(requireNamespace2("RCurl"))
+    if(requireNamespace2("RCurl") &&
+       !is(try(RCurl::url.exists, silent = TRUE), "try-error"))
         RCurl::url.exists(x, ...)
     else {
         con = url(x)
@@ -205,7 +224,7 @@ makePwdFun = function(scm_auth, url)
 ##' @param prefer_svn Currently unused.
 ##' @param \dots Passed directly to constructors for PkgSource superclasses
 ##' @export
-makeSource = function(url, type, user, password, scm_auth, prefer_svn = FALSE, ...) {
+makeSource = function(url, type, user, password, scm_auth = list(), prefer_svn = FALSE, ...) {
     if(is.na(type))
         type = "unknown"
     type = tolower(type)
@@ -384,60 +403,11 @@ system_w_init = function(cmd, dir,
     
 
 
-highestVs = c(9, 14, 2)
-
-
-decrBiocVersion = function(biocVers) {
-    vals = strsplit(biocVers, ".", fixed=TRUE)[[1]]
-    vals  = as.numeric(vals)
-    if(identical(vals, c(1,0))) {
-        NULL
-    } else if (vals[2] == 0) {
-        vals[1] = vals[1] - 1 #decrement major version
-        vals[2] = highestVs[ vals[1] ] #set to highest minor version for that major
-    } else {
-        vals[2] = vals[2] - 1
-    }
-    paste(vals, collapse=".")
+beforeBiocInstaller = function() {
+    Rver = R.Version()
+    vstr = paste(Rver$major, Rver$minor, sep = ".")
+    compareVersion(vstr, "2.14.0") < 0
 }
-
-decrBiocRepo = function(repos, vers = biocVersFromRepo(repos)) {
-    if(!is.character(vers))
-        vers = as.character(vers)
-
-    pieces = strsplit(repos, vers, fixed=TRUE)
-    newvers = decrBiocVersion(vers)
-    if(is.null(newvers)) {
-        warning("Cannot decrement bioc repo version below 1.0")
-        return(NULL)
-    }
-    sapply(pieces, function(x) paste0(x, collapse = newvers))
-}
-
-biocVersFromRepo = function(repos) gsub(".*/([0-9][^/]*)/.*", "\\1", repos[1])
-
-biocReposFromVers = function(vers = develVers) {
-    if(!requireNamespace2("BiocInstaller"))
-        stop("Unable to manipulate bioc versions without BiocInstaller installed")
-   
-    repos = head(BiocInstaller::biocinstallRepos(), -1)
-    bef= gsub("(.*/)[0-9][^/]*/.*", "\\1", repos)
-    af = gsub(".*/[0-9][^/]*(/.*)", "\\1", repos)
-    paste0(bef, vers, af)
-}    
-
-## highestBiocVers = function(repos){
-##     if(!requireNamespace2("BiocInstaller"))
-##         stop("Unable to determine bioc versions without BiocInstaller installed")
-##     else if(missing(repos))
-##         ## head -1 removes the last element
-##         repos =head(BiocInstaller::biocinstallRepos(), -1)
-##     majvers = length(highestVs)
-##     vers = paste(majvers, highestVs[majvers], sep=".")
-##     biocReposFromVers(vers = vers)
-## }
-
-
 
 
 #system(..., intern=TRUE) throws an error if the the command fails,
@@ -537,3 +507,157 @@ download.packages2 = function(pkgs, destdir, avail = NULL,
 }
 
 
+noVignettesArg = function() {
+    Rvers = paste(R.version$major, R.version$minor, sep=".")
+    
+    if(compareVersion(Rvers, "3.1.0") < 0)
+        "--no-vignettes"
+    else
+        "--no-build-vignettes"
+}
+
+
+
+
+## .build_repository_package_db_update = function (dir, fields = NULL,
+##                                                 type = c("source", "mac.binary", 
+##                                                          "win.binary"),
+##                                                 verbose = getOption("verbose"),
+##                                                 unpacked = FALSE,
+##                                                 cur.db) 
+## {
+##     if (unpacked) 
+##         return(tools:::.build_repository_package_db_from_source_dirs(dir, 
+##             fields, verbose))
+##     type <- match.arg(type)
+##     package_pattern <- switch(type, source = "_.*\\.tar\\..*$", 
+##         mac.binary = "_.*\\.tgz$", win.binary = "_.*\\.zip$")
+##     files <- list.files(dir, pattern = package_pattern)
+
+##     filepkgvers = gsub("(\\.tar\\..*|\\.tgz|\\.zip)$", "", basename(files))
+
+##     dbpkgvers = paste(cur.db[,"Package"], cur.db[,"Version"], sep = "_")
+
+##     files = files[!(filepkgvers %in% dbpkgvers)]
+    
+    
+##     if (!length(files)) 
+##         return(list())
+##     fields <- unique(c(tools:::.get_standard_repository_db_fields(type), 
+##         fields))
+##     packages <- sapply(strsplit(files, "_", fixed = TRUE), "[", 
+##         1L)
+##     db <- vector(length(files), mode = "list")
+##     names(db) <- files
+##     op <- options(warn = -1)
+##     on.exit(options(op))
+##     if (verbose) 
+##         message("Processing packages:")
+##     if (type == "win.binary") {
+##         files <- file.path(dir, files)
+##         for (i in seq_along(files)) {
+##             if (verbose) 
+##                 message(paste(" ", files[i]))
+##             con <- unz(files[i], file.path(packages[i], "DESCRIPTION"))
+##             temp <- tryCatch(read.dcf(con, fields = fields)[1L, 
+##                 ], error = identity)
+##             if (inherits(temp, "error")) {
+##                 close(con)
+##                 next
+##             }
+##             db[[i]] <- temp
+##             close(con)
+##         }
+##     }
+##     else {
+##         dir <- file_path_as_absolute(dir)
+##         files <- file.path(dir, files)
+##         cwd <- getwd()
+##         if (is.null(cwd)) 
+##             stop("current working directory cannot be ascertained")
+##         td <- tempfile("PACKAGES")
+##         if (!dir.create(td)) 
+##             stop("unable to create ", td)
+##         on.exit(unlink(td, recursive = TRUE), add = TRUE)
+##         setwd(td)
+##         for (i in seq_along(files)) {
+##             if (verbose) 
+##                 message(paste(" ", files[i]))
+##             p <- file.path(packages[i], "DESCRIPTION")
+##             temp <- try(utils::untar(files[i], files = p))
+##             if (!inherits(temp, "try-error")) {
+##                 temp <- tryCatch(read.dcf(p, fields = fields)[1L, 
+##                   ], error = identity)
+##                 if (!inherits(temp, "error")) {
+##                   if ("NeedsCompilation" %in% fields && is.na(temp["NeedsCompilation"])) {
+##                     l <- utils::untar(files[i], list = TRUE)
+##                     temp["NeedsCompilation"] <- if (any(l == 
+##                       file.path(packages[i], "src/"))) 
+##                       "yes"
+##                     else "no"
+##                   }
+##                   temp["MD5sum"] <- md5sum(files[i])
+##                   db[[i]] <- temp
+##                 }
+##                 else {
+##                   message(gettextf("reading DESCRIPTION for package %s failed with message:\n  %s", 
+##                     sQuote(basename(dirname(p))), conditionMessage(temp)), 
+##                     domain = NA)
+##                 }
+##             }
+##             unlink(packages[i], recursive = TRUE)
+##         }
+##         setwd(cwd)
+##     }
+##     if (verbose) 
+##         message("done")
+##     db
+## }
+
+
+
+## update_PACKAGES = function(dir = ".", fields = NULL,
+##                            type = c("source", "mac.binary", 
+##                                     "win.binary"),
+##                            verbose = FALSE, unpacked = FALSE,
+##                            subdirs = FALSE, latestOnly = TRUE,
+##                            addFiles = FALSE) {
+    
+##     if(!file.exists(file.path(dir, "PACKAGES"))) {
+##         if(verbose)
+##             message("No existing PACKAGES file found, delegating to write_PACKAGES")
+        
+##         ret = tools::write_PACKAGES(dir = dir, fields = fields, type = type,
+##                                     verbose = verbose, unpacked = unpacked,
+##                                     subdirs = subdir, latestOnly = latestOnly,
+##                                     addFiles = addFiles)
+##         return(ret)
+##     } else if (unpacked) {
+##         if(verbose)
+##             message("unpacked is TRUE, delegating to write_PACKAGES")
+##         ret = tools::write_PACKAGES(dir = dir, fields = fields, type = type,
+##                                     verbose = verbose, unpacked = unpacked,
+##                                     subdirs = subdir, latestOnly = latestOnly,
+##                                     addFiles = addFiles)
+##         return(ret)
+##     }
+    
+##     type <- match.arg(type)
+##     nfields <- 0
+##     out <- file(file.path(dir, "PACKAGES"), "wt")
+##     outgz <- gzfile(file.path(dir, "PACKAGES.gz"), "wt")
+
+##     paths <- ""
+##     existing = read.dcf(out)
+##     if (is.logical(subdirs) && subdirs) {
+##         owd <- setwd(dir)
+##         paths <- list.dirs(".")
+##         setwd(owd)
+##         paths <- c("", paths[paths != "."])
+##     }
+##     else if (is.character(subdirs)) 
+##         paths <- c("", subdirs)
+
+
+    
+## }

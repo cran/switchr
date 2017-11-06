@@ -41,7 +41,7 @@ switchBack()
 ###################################################
 ### code chunk number 6: switchrvign.Rnw:125-129
 ###################################################
-man = PkgManifest(name = "fastdigest", 
+man = PkgManifest(name = "fastdigest",
     url = "https://github.com/gmbecker/fastdigest",
     type = "git")
 man
@@ -50,7 +50,7 @@ man
 ###################################################
 ### code chunk number 7: switchrvign.Rnw:136-139
 ###################################################
-man2 = GithubManifest("gmbecker/fastdigest", 
+man2 = GithubManifest("gmbecker/fastdigest",
      "gmbecker/RCacheSuite")
 man2
 
@@ -59,7 +59,7 @@ man2
 ### code chunk number 8: switchrvign.Rnw:150-153
 ###################################################
 man3 = GithubManifest(redland = "ropensci/redland-bindings/R/redland")
-man
+man3
 
 
 
@@ -88,10 +88,10 @@ man
 ### code chunk number 12: switchrvign.Rnw:206-211 (eval = FALSE)
 ###################################################
 ## ## NOT RUN
-## install_packages("fastdigest", 
+## install_packages("fastdigest",
 ##                  versions = c(fastdigest= "0.5-0"),
 ##                  man = man2)
-##                      
+## 
 
 
 ###################################################

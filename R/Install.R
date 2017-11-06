@@ -34,12 +34,13 @@
 ##' install_packages("fastdigest", man)
 ##'
 ##' ## install a full seeding manifest
-##' man2 = makeSeedManifest("myotherlib")
+##' man2 = makeSeedMan("myotherlib")
 ##' install_packages(man2)
 ##' }
 ##' @author Gabriel Becker
 ##' @docType methods
 ##' @rdname install
+##' @references Becker G, Barr C, Gentleman R, Lawrence M; Enhancing Reproducibility and Collaboration via Management of R Package Cohorts. Journal of Statistical Software, 81(1). 2017. doi: 10.18637/jss.v082.i01 
 ##' @export
 ##' @importFrom utils available.packages contrib.url installed.packages
 setGeneric("install_packages", function(pkgs, repos, versions = NULL, verbose = FALSE, ...) standardGeneric("install_packages"))
