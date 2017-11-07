@@ -1,4 +1,4 @@
-f77cd6cfa89abd1ead43b37ebca88aa6 *DESCRIPTION
+e1f39f5dc1d4968d7a33b31f4e193582 *DESCRIPTION
 d0631b443d141bea20be6440341cdae6 *NAMESPACE
 2bf5e1e419960e3287590f8d9bd52aab *NEWS
 5836506c6dd0c83201566c2ea1afb738 *R/AllClasses.R
@@ -11,7 +11,7 @@ be621427f758075a56392948c7d1bad0 *R/accessors.R
 ddb94ac7a98e3feda37f06b7f13c381b *R/allGenerics.R
 bb57932d08d6c7ba83c20089fff15cfc *R/annotateDESCs.R
 b1da0134adb4d3944a674f9c20402f26 *R/biocManifest.R
-498f6d9722a0f691e74cbdd706824b2c *R/biocversion.R
+6700a68effbb305c8d4a4eaeaeed84d1 *R/biocversion.R
 62eeda861ddadf09a72f478375578b99 *R/cmethods.R
 a2ae460b7771c3d4523b6f9750416165 *R/conditionalCode.R
 5af250f2fa8f40c6e753a626066e9495 *R/crandbtmp.R
@@ -41,7 +41,7 @@ e22853c8d4e240f27e82e488e1588ff6 *build/vignette.rds
 07e22d80dfe82d96e6db385ec5652986 *inst/CITATION
 03e02a3afbc1249b1275d565085cf17b *inst/doc/switchrvign.R
 173ae1dc691e2242959ff4c6b43bf583 *inst/doc/switchrvign.Rnw
-0d09df601d5a3a89fb5cb8bab27add15 *inst/doc/switchrvign.pdf
+e162cb67fda5ebb2a0a9f36ce93b502a *inst/doc/switchrvign.pdf
 04a841f23adfeec02a2613b2211b5f0d *inst/examples/crandb.R
 3eba8544a5c88ffbd0a2e76000fdf831 *inst/examples/lazyRepo.R
 d51ac21df6b21219514f9411928b0afc *inst/examples/sessionInfo.R
