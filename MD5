@@ -1,4 +1,4 @@
-e1f39f5dc1d4968d7a33b31f4e193582 *DESCRIPTION
+3c17fd0a2173f9876523988321ce5ceb *DESCRIPTION
 d0631b443d141bea20be6440341cdae6 *NAMESPACE
 2bf5e1e419960e3287590f8d9bd52aab *NEWS
 5836506c6dd0c83201566c2ea1afb738 *R/AllClasses.R
@@ -11,7 +11,7 @@ be621427f758075a56392948c7d1bad0 *R/accessors.R
 ddb94ac7a98e3feda37f06b7f13c381b *R/allGenerics.R
 bb57932d08d6c7ba83c20089fff15cfc *R/annotateDESCs.R
 b1da0134adb4d3944a674f9c20402f26 *R/biocManifest.R
-6700a68effbb305c8d4a4eaeaeed84d1 *R/biocversion.R
+ca0f21c1b6a933e86e618f3574062147 *R/biocversion.R
 62eeda861ddadf09a72f478375578b99 *R/cmethods.R
 a2ae460b7771c3d4523b6f9750416165 *R/conditionalCode.R
 5af250f2fa8f40c6e753a626066e9495 *R/crandbtmp.R
@@ -25,9 +25,9 @@ e266e1c0066cff0388f53a43760d5688 *R/loadGRAN.R
 c41f67ffeeef3090aecd09fa121bf2b4 *R/makeBiocVersions.R
 f41a10677388af728ca5d742293e1d3b *R/makeCheckout.R
 a73bf83a504fbfcaa534c442d0e6e80d *R/makeLibraryCtx.R
-3c9ffc9b52ec97ac059949ca469c079d *R/makePkgSourceDir-methods.R
+7a74b33aa3d0090979c8fcf765b77e91 *R/makePkgSourceDir-methods.R
 809635964aedcfced1e0cf18818944a2 *R/manifest.R
-3aaa2cc226f2130982312eea912b42cb *R/manifestFromLib.R
+9607c0f6796ec547bd2c570513df9aa3 *R/manifestFromLib.R
 5701ce381929a8e9bbe0fa9eb59e3b76 *R/methods.R
 b42b2ee084d47786c073d536843c0f6f *R/profile.R
 40171d7e3146f623ce2786dddb96627e *R/removeLibrary.R
@@ -37,11 +37,11 @@ c5cdadfdaacbc91e72e34d134fe78a3d *R/sessionInfo.R
 fdb15b727481e5b5ca0f2ddda83dc083 *R/show-methods.R
 9a0176445fdff043d04135d4685b8012 *R/zzz.R
 afceb6bf2134b019eb74bbffb26d40ee *README.md
-e22853c8d4e240f27e82e488e1588ff6 *build/vignette.rds
+dbd7f1716df7455da3ecb6aaa750adac *build/vignette.rds
 07e22d80dfe82d96e6db385ec5652986 *inst/CITATION
 03e02a3afbc1249b1275d565085cf17b *inst/doc/switchrvign.R
 173ae1dc691e2242959ff4c6b43bf583 *inst/doc/switchrvign.Rnw
-e162cb67fda5ebb2a0a9f36ce93b502a *inst/doc/switchrvign.pdf
+a7b907f0f4a5aa1cecf36650de7f7dec *inst/doc/switchrvign.pdf
 04a841f23adfeec02a2613b2211b5f0d *inst/examples/crandb.R
 3eba8544a5c88ffbd0a2e76000fdf831 *inst/examples/lazyRepo.R
 d51ac21df6b21219514f9411928b0afc *inst/examples/sessionInfo.R
