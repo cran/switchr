@@ -1,8 +1,21 @@
+sneakyreqpkg = function(pkg, quietly = FALSE) {
+    req = tryCatch(get("requireNamespace"), error = identity)
+    if(is(req, "error"))
+        req = get("require")
+    
+    req(pkg, quietly = quietly)
+}
+
+    
+
 getBiocRepos = function() {
-    if(requireNamespace("BiocManager", quietly = TRUE)) { 
-        bioc = BiocManager::repositories()
-    } else if(requireNamespace2("BiocInstaller", quietly = TRUE)) {
-        bioc = BiocInstaller::biocinstallRepos()
+    ## this sucks but I can't afford the dependency on 3.5.x+ that comes
+    ## with BiocManager :(
+    if(sneakyreqpkg("BiocManager", quietly = TRUE)) { 
+        bioc = get("repositories", asNamespace("BiocManager"))()
+    } else if(sneakyreqpkg("BiocInstaller", quietly = TRUE)) {
+        bcrepofun = get("biocinstallRepos", envir = asNamespace("BiocInstaller")) 
+        bioc = bcrepofun()
     } else if(beforeBiocInstaller()) {
         if(!exists("biocinstallRepos"))
             source("http://bioconductor.org/biocLite.R")
@@ -14,6 +27,10 @@ getBiocRepos = function() {
                 warning("Unable to determine Bioc repositories. They will not be included in the set of default dependency repos")
         } else
             bioc = defaultBiocRepos
+    }
+    if(anyNA(bioc))  {
+        warning("Attempt to determine default Bioconductor repos returned one or more NAs. These will be omitted from the set of default repositories.")
+        bioc = bioc[!is.na(bioc)]
     }
     bioc
 }
@@ -32,7 +49,7 @@ getBiocRepos = function() {
 defaultRepos = function() {
     bioc = getBiocRepos()
     optrepos = getOption("repos")
-    if(optrepos["CRAN"] == "@CRAN@") {
+    if(is.na(optrepos["CRAN"]) || optrepos["CRAN"] == "@CRAN@") {
         ## if bioc has a cranmirror (which it should)
         if(any(grepl("cran", bioc, ignore.case=TRUE))) 
             optrepos = optrepos[!grepl("CRAN", names(optrepos))]

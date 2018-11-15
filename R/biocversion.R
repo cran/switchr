@@ -1,6 +1,11 @@
 if(exists("globalVariables")) {
     globalVariables("biocinstallRepos", "switchr", TRUE)
+    globalVariables("biocinstallname", "switchr", TRUE)
 }
+
+biocinstallname = "BiocInstaller"
+
+
 biocrepostmpl = c("http://bioconductor.org/packages/%%%%/bioc" ,
     "http://bioconductor.org/packages/%%%%/data/annotation" ,
     "http://bioconductor.org/packages/%%%%/data/experiment" ,
@@ -129,10 +134,8 @@ biocreposfactory = function() {
     function() {
         if(!is.null(bcrepos))
             bcrepos
-        else if(requireNamespace("BiocManager"))
-            BiocManager::repositories()
-        else if(requireNamespace2("BiocInstaller"))
-            BiocInstaller::biocinstallRepos()
+        else if(length(getBiocRepos()))
+            bcrepos = getBiocRepos()
         else
             stop("Unable to determine bioc base repos. Please install BiocManager or BiocInstaller, depending on R version.")
     }
@@ -197,10 +200,6 @@ biocReposFromVers = function(vers = develVers) {
         repos = repos[grepl("bioconductor.org", repos)]
     } else {
         
-        ## if(!requireNamespace2("BiocInstaller"))
-        ##     stop("Unable to manipulate bioc versions without BiocInstaller installed")
-   
-        ## repos = head(BiocInstaller::biocinstallRepos(), -1)
         repos = biocBaseRepos()
         repos = repos[grep("BioC", names(repos))]
     }
