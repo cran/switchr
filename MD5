@@ -1,4 +1,4 @@
-26342a29b208622beb0d1676f501e0a0 *DESCRIPTION
+79a3e74cce4a6d3a2b63f500dc8c2af5 *DESCRIPTION
 4c1e63b304886859f1343085f55b315d *NAMESPACE
 2bf5e1e419960e3287590f8d9bd52aab *NEWS
 f8fa056000e07be9924ae155d54c0834 *R/00graceful_inet.R
@@ -12,7 +12,7 @@ a0cb67a08a43ddb04d1fb9c3d09e7f3e *R/SwitchrParam.R
 ddb94ac7a98e3feda37f06b7f13c381b *R/allGenerics.R
 bb57932d08d6c7ba83c20089fff15cfc *R/annotateDESCs.R
 0d76b4abbff6eccc69a0472ad341c6f1 *R/biocManifest.R
-03ea5e13d9ff82839ff9876a6ffb901a *R/biocversion.R
+36fc5ce84dd0d401013fbbafc03f889b *R/biocversion.R
 62eeda861ddadf09a72f478375578b99 *R/cmethods.R
 d41d8cd98f00b204e9800998ecf8427e *R/conditionalCode.R
 0a09562aa56c18291b0f1faf595e6939 *R/crandbtmp.R
@@ -40,11 +40,11 @@ fdb15b727481e5b5ca0f2ddda83dc083 *R/show-methods.R
 797b2fe0aff93653b162a0c276ce2f51 *R/write_PACKAGES2.R
 3c7894275bedda63174a0c27a49e850a *R/zzz.R
 afceb6bf2134b019eb74bbffb26d40ee *README.md
-b9324e785120fe450e529fada417fed0 *build/vignette.rds
+367333edce57f427afa61f5acc309c0b *build/vignette.rds
 07e22d80dfe82d96e6db385ec5652986 *inst/CITATION
 169b5112c91023f36e3d1793e76af68b *inst/doc/switchrvign.R
 4b398db618e973601e6999df6828f300 *inst/doc/switchrvign.Rnw
-b58243ee0d2742e4d80f7ce6d1da6cb3 *inst/doc/switchrvign.pdf
+0acb69e76e8734edf82cf3fb3ef6f283 *inst/doc/switchrvign.pdf
 04a841f23adfeec02a2613b2211b5f0d *inst/examples/crandb.R
 3eba8544a5c88ffbd0a2e76000fdf831 *inst/examples/lazyRepo.R
 d51ac21df6b21219514f9411928b0afc *inst/examples/sessionInfo.R
