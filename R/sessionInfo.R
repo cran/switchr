@@ -1,6 +1,9 @@
 ##' Parse text output from printing SessionInfo objects
 ##' @param string The text output from sessionInfo()
 ##' @export
+##' @return a \code{parsedSessionInfo} object encoding the
+##' information \code{string} (ie print output of a
+##' \code{sessionInfo} call).
 parseSessionInfoString = function(string)
 {
     Rvers = getRVersion(string)

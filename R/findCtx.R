@@ -25,7 +25,7 @@ findCompEnv = function(url = NULL, name, rvers = NULL, allMatches = FALSE) {
                                  exclude.site = manrow$excl.site))
     }
 }
-            
+
 
 ##' Get or set the base directory for switchr libraries
 ##'
@@ -34,6 +34,8 @@ findCompEnv = function(url = NULL, name, rvers = NULL, allMatches = FALSE) {
 ##' is returned. Otherwise the \code{value} is set as the default directory
 ##' and returned.
 ##' @export
+##' @return The current base directory for switchr to create context-specific
+##' library paths under (\emph{after} setting it if \code{value} is not missing).
 switchrBaseDir = function(value) {
     if(missing(value))
         if(is.null(switchrOpts$basedir)) "~/.switchr" else switchrOpts$basedir
@@ -58,7 +60,7 @@ switchrBaseDir = function(value) {
 switchrManifest = function() {
     dir = switchrBaseDir()
     manfile = file.path(dir, "manifest.dat")
-    
+
     if(!file.exists(manfile) || length(readLines(manfile)) == 0)
         data.frame(url = character(), name = character(), libpaths = character(),
                    stringsAsFactors = FALSE, rversion = character())
@@ -76,7 +78,7 @@ updateManifest = function() {
     dirs = list.dirs(switchrBaseDir(), recursive=FALSE)
     fils = file.path(dirs, "lib_info")
     fils = fils[file.exists(fils)]
-                     
+
     man = do.call(rbind.data.frame, lapply(fils, function(x) read.table(x, stringsAsFactors = FALSE, header = TRUE)))
     if(nrow(man) > 0)
         write.table(man, file = file.path(switchrBaseDir(), "manifest.dat"))

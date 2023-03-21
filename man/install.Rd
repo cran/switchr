@@ -40,6 +40,9 @@ or a PkgManifest or SessionManifest (or a url thereof)}
 
 \item{\dots}{extra parameters passed directly to install.packages}
 }
+\value{
+a vector of names of the packages installed.
+}
 \description{
 Install packages from a set of traditional repositories, or a Just-in-time
 repository constructed using a PkgManifest or SessionManifest

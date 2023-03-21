@@ -11,6 +11,9 @@ GithubManifest(..., pkgrepos)
 
 \item{pkgrepos}{Github repositories in the form "<user>/<reponame>"}
 }
+\value{
+A GithubManifest object representing the specified github repos.
+}
 \description{
 Create a package manifest containing only github packages
 }

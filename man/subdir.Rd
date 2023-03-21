@@ -23,6 +23,11 @@ subdir(x) <- value
 
 \item{value}{The new subdirectory to associate with the object}
 }
+\value{
+For the getter, the subdirectory within the overall source to
+find the actual package source code, for the setter, an updated
+\code{PkgSource} object with the new subdirectory set.
+}
 \description{
 accessor for subdirectory.
 }

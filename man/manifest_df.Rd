@@ -31,10 +31,15 @@ manifest_df(x) <- value
 
 \item{...}{unused.}
 
-\item{session_only}{Only return manifest rows associated with}
+\item{session_only}{Only return manifest rows associated with the
+versioned cohort defined in \code{x} (\code{SessionManifest}s only).}
 
 \item{value}{A data.frame of package manifest information.
 See \code{\link{ManifestRow}}}
+}
+\value{
+for the getter, the manifest data.frame corresponding to the manifest,
+for the setter, a manifest updated with the new manifest data.frame.
 }
 \description{
 Get or set the package location manifest (data.frame) associated with an

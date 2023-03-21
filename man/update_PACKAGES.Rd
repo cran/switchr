@@ -52,6 +52,10 @@ to \code{message}}
 \item{\dots}{Additional arguments to \code{write_PACKAGES} -  e.g., the relatively new
 rds_compress argument.}
 }
+\value{
+Called for its side-effect of updating a package repository index
+\code{PACKAGES} file and siblings.
+}
 \description{
 Update an existing repository by reading the PACKAGES
 file and only processing built package tarballs which do not
@@ -116,6 +120,9 @@ While both strict and nonstrict modes offer speedups when
     updating small percentages of large repositories, non-strict
     mode is \emph{much} faster and is recommended in situations where the
     assumptions it makes are safe.
+
+For versions of R \code{3.6.0} and later, use \code{tools::update_PACKAGES},
+which was adapted from this fuction, instead.
 }
 \seealso{
 \link[tools]{write_PACKAGES}

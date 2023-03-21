@@ -23,6 +23,11 @@ branch(x) <- value
 
 \item{value}{The new branch}
 }
+\value{
+for the getter, the branch associated with the source
+object, for the setter, the object updated to use the specified
+branch.
+}
 \description{
 Get or set the branch associated with a Package Source
 }

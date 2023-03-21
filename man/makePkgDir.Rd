@@ -117,6 +117,10 @@ in a SCM package without a formal checkout be used?}
 \item{forceRefresh}{Should an existing instance of the package source be
 deleted/refreshed}
 }
+\value{
+logical scalar indicating success (\code{TRUE}) or failure of
+the operation.
+}
 \description{
 This is an internal function not intended to be called directly by end users
 }

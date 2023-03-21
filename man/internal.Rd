@@ -5,7 +5,7 @@
 \alias{warning2}
 \title{Internal internet harness}
 \usage{
-graceful_inet(val)
+graceful_inet(val, silent)
 
 warning2(...)
 }
@@ -14,7 +14,13 @@ warning2(...)
 but actually attempt the call, FALSE means force immedate failure without evaling
 expressions wrapped in inet_handlers() calls}
 
+\item{silent}{logical(1). Should errors and warnings be emitted as messages (FALSE)
+or be fully suppressed (TRUE).}
+
 \item{\dots}{passed to message or base::warning}
+}
+\value{
+varies, these are internal functions not intended for end users.
 }
 \description{
 This function should never be called by code outside of tests/vignettes

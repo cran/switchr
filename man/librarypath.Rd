@@ -12,6 +12,10 @@
 \item{exclude.site}{logical. Should the site library be suppressed.
 Defaults to TRUE}
 }
+\value{
+a vector of library paths currently in use, optionally
+excluding the site library.
+}
 \description{
 A version of .libPaths which allows for excluding the site library
 }

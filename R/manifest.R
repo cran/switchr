@@ -89,6 +89,7 @@ makeManifest = function(..., dep_repos = defaultRepos()) {
 ##'
 ##'
 ##' @export
+##' @return A GithubManifest object representing the specified github repos.
 GithubManifest = function( ..., pkgrepos) {
 
     if(missing(pkgrepos)) {

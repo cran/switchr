@@ -10,13 +10,16 @@ biocrepos <- NULL
 ##' @param version The Bioconductor release to generate URLs for.
 ##' @note This function will only work if some version of Bioconductor (>2.9)
 ##' was installed when switchr was installed. It will return NULL otherwise.
+##' @return the repositories associated with the specified Bioconductor version.
 ##' @export
 biocReposForVers = function(version) {
-    bioc = getBiocRepos()
+    bioc = getBiocRepos(trim = FALSE)
     if(is.null(bioc))
-        NULL
+        return(NULL)
     else
-        gsub("(.*)/[[:digit:]\\.]+/(.*)", sprintf("\\1/%s/\\2", version), bioc)
+        ret = gsub("(.*)/[[:digit:]\\.]+/(.*)", sprintf("\\1/%s/\\2", version), bioc)
+    ret = trim_potential_bioc_repos(ret)
+    ret
 }
 
 
@@ -29,10 +32,13 @@ biocReposForVers = function(version) {
 ##' @param name The default name for switchr libraries created with this object
 ##' @param repos The urls of the Bioconductor repositories. these will be
 ##' modified automatically to match the specified version
+##' @return A RepoSubset object for the specified release of Bioconductor,
+##' which contains only the BiocInstaller or BiocManager package, as
+##' appropriate for that version.
 ##' @export
 BiocVers = function(version = getBiocReleaseVr(),
-    name = paste("BioC", version, sep="_"),
-    repos  = biocReposForVers(version)) {
+                    name = paste("BioC", version, sep="_"),
+                    repos  = biocReposForVers(version)) {
 
     if(is.null(repos))
         stop("I don't know where the bioconductor repositories are. Unable to proceed")

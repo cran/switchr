@@ -23,6 +23,11 @@ dl_method(x) <- value
 
 \item{value}{The new number of seconds to wait}
 }
+\value{
+for the getter, the download method specified in the
+\code{SwitchrParam} object, for the setter, the object
+updated with the new download method.
+}
 \description{
 Get or set the download method for retreiving files.
 }

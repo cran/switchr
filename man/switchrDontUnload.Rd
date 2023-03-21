@@ -11,6 +11,10 @@ switchrDontUnload(value, add = TRUE)
 
 \item{add}{Should \code{value} be added to the existing list?}
 }
+\value{
+the set of packages switchr will not attempt to unload which changing
+contexts (after setting it, if \code{value} is missing)
+}
 \description{
 Get or set packages which should NOT be unloaded when flushing the system,
 e.g., when switching between libraries.

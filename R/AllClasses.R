@@ -1,6 +1,6 @@
 ##' @import methods
 ##' @importFrom utils chooseCRANmirror
-##' 
+##'
 NULL
 
 setOldClass("sessionInfo")
@@ -31,10 +31,11 @@ setClass("SwitchrCtx", representation(name = "character",
 ##' @param seed An object representing the list of packages the switchr context
 ##' was seeded with.
 ##' @aliases SwitchrCtx-class
-##' @references Becker G, Barr C, Gentleman R, Lawrence M; Enhancing Reproducibility and Collaboration via Management of R Package Cohorts. Journal of Statistical Software, 81(1). 2017. doi: 10.18637/jss.v082.i01 
+##' @references Becker G, Barr C, Gentleman R, Lawrence M; Enhancing Reproducibility and Collaboration via Management of R Package Cohorts. Journal of Statistical Software, 81(1). 2017. doi: 10.18637/jss.v082.i01
 ##'@export
+##' @return a \code{SwitchrCtx} object.
 SwitchrCtx = function(name, libpaths, exclude.site = TRUE, seed = NULL) {
-    
+
     ctx = new("SwitchrCtx", name= name, libpaths = libpaths,
         exclude.site = exclude.site,
         packages = data.frame(Package = character(),
@@ -61,16 +62,17 @@ setClass("RepoSubset", representation(repos = "character",
 ##' seed a switchr context
 ##' @aliases RepoSubset-class
 ##' @export
+##' @return a \code{RepoSubset} object.
 RepoSubset = function(repos, pkgs, default_name) {
     new("RepoSubset", repos = repos, pkgs = pkgs, default_name = default_name)
 }
 
 ##' PkgSource
-##' 
+##'
 ##' An object representing the source location of a package. This is a virtual
 ##' used exlusively through its subclasses, which are used to differentiate the
 ##' different types of package source locations.
-##' 
+##'
 ##' @export
 setClass("PkgSource", representation(name = "character",location="character",
                                      branch = "character",
@@ -120,8 +122,12 @@ setAs("GitSource", "SVNSource",
 
 
 
+get_repos_option <- function() {
+    suppressMessages(options()[["repos"]])
+}
+
 ensureCRANmirror = function(ind=1L) {
-    repopt = getOption("repos")
+    repopt = get_repos_option()
     if(!interactive() &&
        (any(repopt == "@CRAN@") || is.na(repopt[["CRAN"]])))
         chooseCRANmirror(ind=ind)
@@ -149,6 +155,7 @@ setClass("PkgManifest", representation( manifest = "data.frame",
 ##' @export
 ##' @aliases PkgManifest-class
 ##' @importFrom utils read.table
+##' @return a \code{PkgManifest} object.
 PkgManifest = function(manifest = ManifestRow(...), dep_repos = defaultRepos(), ..., dl_method){
     ensureCRANmirror(1L)
     if(is.character(manifest)) {
@@ -207,7 +214,7 @@ SessionManifest = function(manifest, versions = character()) {
     unknown = setdiff(versions$name, manifest_df(manifest)$name)
     if(length(unknown) > 0)
         stop("Setting version constraints on packages not listed in the manifest is not currently supported")
-    
+
     new("SessionManifest", pkg_versions = versions, pkg_manifest = manifest)
 }
 
@@ -223,11 +230,11 @@ setClass("parsedSessionInfo", representation(version = "character",
 
 
 
-##' LibraryProfile (experimental)
-##' 
-##' Currently unused/under heavy development.
-##'
-##' An object
+## LibraryProfile (experimental)
+##
+## Currently unused/under heavy development.
+##
+## An object
 setClass("LibraryProfile", representation(autoloads = "character",
                                           script = "character"))
 

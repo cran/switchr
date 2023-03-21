@@ -23,6 +23,9 @@ for the packages listed in \code{manifest}.}
 \item{dl_method}{Download method. Ignored unless \code{manifest} is a
 character scalar containing a URL to a serialized manifest}
 }
+\value{
+a \code{PkgManifest} object.
+}
 \description{
 Construct a PkgManifest, which can be installed from using \code{\link{install_packages}}
 }

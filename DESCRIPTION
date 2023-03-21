@@ -2,7 +2,7 @@ Package: switchr
 Type: Package
 Title: Installing, Managing, and Switching Between Distinct Sets of
         Installed Packages
-Version: 0.14.5
+Version: 0.14.8
 Author: Gabriel Becker[aut, cre]
 Maintainer: Gabriel Becker <gabembecker@gmail.com>
 Copyright: Genentech Inc
@@ -15,12 +15,13 @@ Description: Provides an abstraction for managing, installing,
     and non-repository sources and tracks package provenance.
 Imports: tools, RJSONIO, RCurl
 Depends: methods
+Suggests: BiocManager
 SystemRequirements: git, svn
 License: Artistic-2.0
 URL: https://github.com/gmbecker/switchr
 BugReports: https://github.com/gmbecker/switchr/issues
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2022-02-01 00:09:24 UTC; gabrielbecker
+Packaged: 2023-03-20 00:26:22 UTC; gabrielbecker
 Repository: CRAN
-Date/Publication: 2022-02-01 01:00:02 UTC
+Date/Publication: 2023-03-21 17:00:02 UTC

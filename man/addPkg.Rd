@@ -50,6 +50,10 @@ a SessionManifest, ignored otherwise}
 any already in the manifest in the case of duplicates. Otherwise, an error
 is thrown.}
 }
+\value{
+\code{x}, with the relevant package(s) added to it (in the case
+of a manifest) or its associated manifest.
+}
 \description{
 Add a package to an object associated with a manifest
 }

@@ -6,6 +6,10 @@
 \usage{
 currentCompEnv()
 }
+\value{
+A \code{SwitchrCtx} object representing the current computing
+environment.
+}
 \description{
 Display the computing environment currently in use. If switchTo has not been
 called, a new SwitchrCtx object describing the current environment is

@@ -26,7 +26,7 @@ list.dirs = function(path = ".", full.names = TRUE, recursive = TRUE) {
                          recursive = recursive)
     else {
         ## very old versions of list.files don't have include.dirs or no..
-        
+
         dirs = list.files(path, recursive = recursive,
                           full.names = full.names)
         dirs = dirs[sapply(dirs, function(x) file.info(x)$isdir)]
@@ -98,7 +98,7 @@ remOtherPkgVersions = function(pkgname, version, repodir, storagedir, verbose=FA
     if(is.na(version))
         return()
     tballpat = paste0(pkgname, "_")
-  
+
   allinrepo = list.files(repodir, pattern = tballpat, full.names=TRUE)
   wrongvers = !grepl(version, allinrepo, fixed=TRUE)
   if(all(!wrongvers))
@@ -106,7 +106,7 @@ remOtherPkgVersions = function(pkgname, version, repodir, storagedir, verbose=FA
   if(verbose)
     message(sprintf("found %d other versions of the package in the repo directory (%s). Moving them to the storage directory (%s)",
                     sum(wrongvers), repodir, storagedir))
-  file.rename(allinrepo[wrongvers], 
+  file.rename(allinrepo[wrongvers],
               file.path(storagedir, basename(allinrepo[wrongvers])))
 }
 
@@ -119,7 +119,7 @@ fileFromBuiltPkg = function(archive, files, ...) {
          "tgz" = untar,
          stop(sprintf("unrecognized extension %s", ext))
   )
-  
+
   fun(archive, files = files, ...)
 }
 
@@ -135,7 +135,13 @@ fileFromBuiltPkg = function(archive, files, ...) {
 ## }
 
 ##'Check if a directory contains package sources
-##' @param dir The directory
+##'
+##' @details Any directory containing a \code{DESCRIPTION}
+##' file as a direct child is considered a package source
+##' directory, while any that do not are not.
+##' @param dir The directory.
+##' @return Logical scalar indicating if the directory
+##' contains the source code for a package.
 ##' @export
 checkIsPkgDir = function (dir)
 {
@@ -195,7 +201,7 @@ findPkgDir = function(rootdir, branch, subdir,param)
                        "Missing branch?"))
         return(NULL)
     }
-    
+
     ##Find a package. First look in ret, then in ret/package and ret/pkg
     ##we could be more general and allow people to specify subdirectories...
     if(!checkIsPkgDir(ret))
@@ -227,7 +233,7 @@ makePwdFun = function(scm_auth, url)
             scm_auth[[which(ind)]][2]
         else
             ""
-       
+
     }
 
 ##' Create a PkgSource object for a package
@@ -243,9 +249,11 @@ makePwdFun = function(scm_auth, url)
 ##' @param prefer_svn Currently unused.
 ##' @param \dots Passed directly to constructors for PkgSource superclasses
 ##' @export
+##' @return an object inheriting from \code{PkgSource} for the specified
+##' location of a package's source code.
 makeSource = function(url, type, user, password, scm_auth = list(), prefer_svn = FALSE, ...) {
     if(is.na(url) && is.na(type)) {
-        repos = c(getOption("repos"), getBiocRepos())
+        repos = c(get_repos_option(), getBiocRepos())
         repos = repos[!duplicated(names(repos))]
         atcran = grep("@CRAN@", repos)
         if(length(atcran) > 0 && !interactive())
@@ -254,7 +262,7 @@ makeSource = function(url, type, user, password, scm_auth = list(), prefer_svn =
         ## name is passed in as a ... here, and usually not needed
         ## but it is needed if we are trying to find the url/type
         ## of a package
-        
+
         name = list(...)$name
         stopifnot(!is.null(name))
         ## see manifestFromLib.R
@@ -262,7 +270,7 @@ makeSource = function(url, type, user, password, scm_auth = list(), prefer_svn =
         type = tmp$type # either still NA or a real type
         url = tmp$url # either still NA or a real url
     }
-    
+
     if(is.na(type)) {
         type = "unknown"
     }
@@ -311,12 +319,12 @@ makeSource = function(url, type, user, password, scm_auth = list(), prefer_svn =
 ##' @return A path
 ##' @note Unlike \code{\link{findPkgDir}} this does not look for existing
 ##' package source directories. It only constructs the path.
-##' 
+##'
 ##' @export
 getPkgDir = function(basepath,name,  subdir, scm_type, branch)
 {
 
-    
+
     basepath = normalizePath2(basepath)
     if(!file.exists(file.path(basepath, name)))
         stop("directory not found")
@@ -356,7 +364,7 @@ getPkgDir = function(basepath,name,  subdir, scm_type, branch)
 ##' @export
 normalizePath2 = function(path, follow.symlinks=FALSE, winslash = "\\", mustWork = NA)
     {
-        
+
         if(follow.symlinks || Sys.info()["sysname"]=="Windows")
             return(normalizePath(path, winslash = winslash, mustWork = mustWork))
         else {
@@ -381,7 +389,7 @@ normalizePath2 = function(path, follow.symlinks=FALSE, winslash = "\\", mustWork
                 path = file.path(getwd(), substr(path,2, nchar(path)))
             path = gsub(paste(rep(.Platform$file.sep, 2), collapse=""), .Platform$file.sep, path, fixed=TRUE)
             path
-            
+
         }
     }
 
@@ -415,22 +423,22 @@ system_w_init = function(cmd, dir,
 
     if(length(cmd) > 1)
         stop("Vectors of commands not supported by system_w_init")
-    
-    
+
+
     if(!length(init) && !is.null(param))
         init = sh_init_script(param)
 
     ## hacky barebones  recreation of system2
-    
+
     if(isWindows())
         cmd = paste( c(shQuote(cmd), env, args), collapse = " ")
     else
         cmd = paste( c(env, shQuote(cmd), args), collapse = " ")
-    
-    
-    if(length(init) && nchar(init))         
+
+
+    if(length(init) && nchar(init))
         paste(shQuote(paste("source", init, ";")), cmd)
-    
+
     if(!missing(dir)) {
         oldwd  = getwd()
         setwd(dir)
@@ -439,7 +447,7 @@ system_w_init = function(cmd, dir,
     system(cmd, ...)
 }
 
-    
+
 
 
 beforeBiocInstaller = function() {
@@ -479,7 +487,7 @@ requireNamespace2 = function(...) {
 ## when paste0 doesn't exist.
 if(!exists("paste0"))
     paste0 = function(...) paste(..., sep="")
-        
+
 
 sourceFromManifest = function(pkg, manifest, scm_auths = list(bioconductor=c("readonly", "readonly")), ...) {
     mandf = manifest_df(manifest)
@@ -524,9 +532,9 @@ download.file2 = function(url, destfile, method, ...) {
 
 
 download.packages2 = function(pkgs, destdir, avail = NULL,
-                              repos = getOption("repos"),
+                              repos = get_repos_option(),
                               contrib = contrib.url(repos, type),
-                              method, type = getOption("pkgType"),
+                              method, type = get_repos_option(),
                               ...) {
     if(missing(method)) {
         lc = capabilities("libcurl")
@@ -548,7 +556,7 @@ download.packages2 = function(pkgs, destdir, avail = NULL,
 
 noVignettesArg = function() {
     Rvers = paste(R.version$major, R.version$minor, sep=".")
-    
+
     if(compareVersion(Rvers, "3.1.0") < 0)
         "--no-vignettes"
     else
@@ -559,17 +567,17 @@ noVignettesArg = function() {
 
 
 ## .build_repository_package_db_update = function (dir, fields = NULL,
-##                                                 type = c("source", "mac.binary", 
+##                                                 type = c("source", "mac.binary",
 ##                                                          "win.binary"),
 ##                                                 verbose = getOption("verbose"),
 ##                                                 unpacked = FALSE,
-##                                                 cur.db) 
+##                                                 cur.db)
 ## {
-##     if (unpacked) 
-##         return(tools:::.build_repository_package_db_from_source_dirs(dir, 
+##     if (unpacked)
+##         return(tools:::.build_repository_package_db_from_source_dirs(dir,
 ##             fields, verbose))
 ##     type <- match.arg(type)
-##     package_pattern <- switch(type, source = "_.*\\.tar\\..*$", 
+##     package_pattern <- switch(type, source = "_.*\\.tar\\..*$",
 ##         mac.binary = "_.*\\.tgz$", win.binary = "_.*\\.zip$")
 ##     files <- list.files(dir, pattern = package_pattern)
 
@@ -578,27 +586,27 @@ noVignettesArg = function() {
 ##     dbpkgvers = paste(cur.db[,"Package"], cur.db[,"Version"], sep = "_")
 
 ##     files = files[!(filepkgvers %in% dbpkgvers)]
-    
-    
-##     if (!length(files)) 
+
+
+##     if (!length(files))
 ##         return(list())
-##     fields <- unique(c(tools:::.get_standard_repository_db_fields(type), 
+##     fields <- unique(c(tools:::.get_standard_repository_db_fields(type),
 ##         fields))
-##     packages <- sapply(strsplit(files, "_", fixed = TRUE), "[", 
+##     packages <- sapply(strsplit(files, "_", fixed = TRUE), "[",
 ##         1L)
 ##     db <- vector(length(files), mode = "list")
 ##     names(db) <- files
 ##     op <- options(warn = -1)
 ##     on.exit(options(op))
-##     if (verbose) 
+##     if (verbose)
 ##         message("Processing packages:")
 ##     if (type == "win.binary") {
 ##         files <- file.path(dir, files)
 ##         for (i in seq_along(files)) {
-##             if (verbose) 
+##             if (verbose)
 ##                 message(paste(" ", files[i]))
 ##             con <- unz(files[i], file.path(packages[i], "DESCRIPTION"))
-##             temp <- tryCatch(read.dcf(con, fields = fields)[1L, 
+##             temp <- tryCatch(read.dcf(con, fields = fields)[1L,
 ##                 ], error = identity)
 ##             if (inherits(temp, "error")) {
 ##                 close(con)
@@ -612,26 +620,26 @@ noVignettesArg = function() {
 ##         dir <- file_path_as_absolute(dir)
 ##         files <- file.path(dir, files)
 ##         cwd <- getwd()
-##         if (is.null(cwd)) 
+##         if (is.null(cwd))
 ##             stop("current working directory cannot be ascertained")
 ##         td <- tempfile("PACKAGES")
-##         if (!dir.create(td)) 
+##         if (!dir.create(td))
 ##             stop("unable to create ", td)
 ##         on.exit(unlink(td, recursive = TRUE), add = TRUE)
 ##         setwd(td)
 ##         for (i in seq_along(files)) {
-##             if (verbose) 
+##             if (verbose)
 ##                 message(paste(" ", files[i]))
 ##             p <- file.path(packages[i], "DESCRIPTION")
 ##             temp <- try(utils::untar(files[i], files = p))
 ##             if (!inherits(temp, "try-error")) {
-##                 temp <- tryCatch(read.dcf(p, fields = fields)[1L, 
+##                 temp <- tryCatch(read.dcf(p, fields = fields)[1L,
 ##                   ], error = identity)
 ##                 if (!inherits(temp, "error")) {
 ##                   if ("NeedsCompilation" %in% fields && is.na(temp["NeedsCompilation"])) {
 ##                     l <- utils::untar(files[i], list = TRUE)
-##                     temp["NeedsCompilation"] <- if (any(l == 
-##                       file.path(packages[i], "src/"))) 
+##                     temp["NeedsCompilation"] <- if (any(l ==
+##                       file.path(packages[i], "src/")))
 ##                       "yes"
 ##                     else "no"
 ##                   }
@@ -639,8 +647,8 @@ noVignettesArg = function() {
 ##                   db[[i]] <- temp
 ##                 }
 ##                 else {
-##                   message(gettextf("reading DESCRIPTION for package %s failed with message:\n  %s", 
-##                     sQuote(basename(dirname(p))), conditionMessage(temp)), 
+##                   message(gettextf("reading DESCRIPTION for package %s failed with message:\n  %s",
+##                     sQuote(basename(dirname(p))), conditionMessage(temp)),
 ##                     domain = NA)
 ##                 }
 ##             }
@@ -648,7 +656,7 @@ noVignettesArg = function() {
 ##         }
 ##         setwd(cwd)
 ##     }
-##     if (verbose) 
+##     if (verbose)
 ##         message("done")
 ##     db
 ## }
@@ -656,16 +664,16 @@ noVignettesArg = function() {
 
 
 ## update_PACKAGES = function(dir = ".", fields = NULL,
-##                            type = c("source", "mac.binary", 
+##                            type = c("source", "mac.binary",
 ##                                     "win.binary"),
 ##                            verbose = FALSE, unpacked = FALSE,
 ##                            subdirs = FALSE, latestOnly = TRUE,
 ##                            addFiles = FALSE) {
-    
+
 ##     if(!file.exists(file.path(dir, "PACKAGES"))) {
 ##         if(verbose)
 ##             message("No existing PACKAGES file found, delegating to write_PACKAGES")
-        
+
 ##         ret = tools::write_PACKAGES(dir = dir, fields = fields, type = type,
 ##                                     verbose = verbose, unpacked = unpacked,
 ##                                     subdirs = subdir, latestOnly = latestOnly,
@@ -680,7 +688,7 @@ noVignettesArg = function() {
 ##                                     addFiles = addFiles)
 ##         return(ret)
 ##     }
-    
+
 ##     type <- match.arg(type)
 ##     nfields <- 0
 ##     out <- file(file.path(dir, "PACKAGES"), "wt")
@@ -694,9 +702,9 @@ noVignettesArg = function() {
 ##         setwd(owd)
 ##         paths <- c("", paths[paths != "."])
 ##     }
-##     else if (is.character(subdirs)) 
+##     else if (is.character(subdirs))
 ##         paths <- c("", subdirs)
 
 
-    
+
 ## }

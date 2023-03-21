@@ -15,6 +15,9 @@ RepoSubset(repos, pkgs, default_name)
 \item{default_name}{The default name to use when the RepoSubset is used to
 seed a switchr context}
 }
+\value{
+a \code{RepoSubset} object.
+}
 \description{
 An object that represents a subset of packages available in a repo. When switched to, switchr will default to only installing the
 specified packages, rather than all packages in the repository.

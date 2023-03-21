@@ -14,6 +14,11 @@ library_paths(seed)
 \arguments{
 \item{seed}{An SwitchrCtx}
 }
+\value{
+for the getter, the set of library paths associated with
+the \code{SwitchrCtx} object, for the setter, said context udpated
+with the new full set of library paths.
+}
 \description{
 Accessor for which directories an SwitchrCtx is associated with.
 }

@@ -23,6 +23,11 @@ versions_df(x) <- value
 
 \item{value}{A data.frame of package version information.}
 }
+\value{
+For the getter, a data.frame indicating the versions-specific cohort
+of packages defined by \code{x}, for the setter, the \code{SessionManifest} object
+updated with the new versions data.frame.
+}
 \description{
 Get or set the the versions information in a SessionManifest
 }

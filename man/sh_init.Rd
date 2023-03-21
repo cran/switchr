@@ -23,6 +23,11 @@ sh_init_script(x) <- value
 
 \item{value}{The new value.}
 }
+\value{
+For the getter, the shell initialization script/commands,
+for the setter, an updated \code{SwitchrParam} object with the
+new shell initialization set.
+}
 \description{
 Set or Retrieve the shell initialization script for an object
 }

@@ -18,6 +18,11 @@ BiocVers(
 \item{repos}{The urls of the Bioconductor repositories. these will be
 modified automatically to match the specified version}
 }
+\value{
+A RepoSubset object for the specified release of Bioconductor,
+which contains only the BiocInstaller or BiocManager package, as
+appropriate for that version.
+}
 \description{
 A constructor for creating a RepoSubset object for a
 specified release of Bioconductor, which includes only the

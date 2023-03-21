@@ -17,6 +17,11 @@
 
 \item{recursive}{Unused}
 }
+\value{
+An object of the same class as \code{x}
+containing the combined contents of \code{x} and
+all elements of \code{...}.
+}
 \description{
 Combine 2 or more manifests of the same type (PkgManifest or SessionManifest)
 }

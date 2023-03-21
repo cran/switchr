@@ -10,6 +10,9 @@ An object of class \code{character} of length 20.
 \usage{
 switchDeps
 }
+\value{
+the base packages, plus the set of packages switchr itself has dependencies on
+}
 \description{
 The base packages, as well as switchr and its dependencies.
 }

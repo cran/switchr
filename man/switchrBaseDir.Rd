@@ -9,6 +9,10 @@ switchrBaseDir(value)
 \arguments{
 \item{value}{A new value for the base directory}
 }
+\value{
+The current base directory for switchr to create context-specific
+library paths under (\emph{after} setting it if \code{value} is not missing).
+}
 \description{
 Get or set the base directory for switchr libraries
 }

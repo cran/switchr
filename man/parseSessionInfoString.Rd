@@ -9,6 +9,11 @@ parseSessionInfoString(string)
 \arguments{
 \item{string}{The text output from sessionInfo()}
 }
+\value{
+a \code{parsedSessionInfo} object encoding the
+information \code{string} (ie print output of a
+\code{sessionInfo} call).
+}
 \description{
 Parse text output from printing SessionInfo objects
 }

@@ -6,7 +6,7 @@
 ##'
 ##' This is intended to stop intermittent install failures
 ##' due to failing to retrieve files that *are* in the
-##' archive but are not downloading properly when a larger 
+##' archive but are not downloading properly when a larger
 ##' number of packages is being retrieved.
 ##'
 ##' @param x A SwitchrParam object
@@ -37,7 +37,7 @@ setMethod("archive_timing<-", "SwitchrParam", function(x, value) {
 
 
 ##' @title Get or set the number of seconds to wait between successive shell commands
-##' 
+##'
 ##' @description This is intended to stop intermittent install failures
 ##' due to network drive latency interacting with git commands
 ##'
@@ -72,6 +72,9 @@ setMethod("shell_timing<-", "SwitchrParam", function(x, value) {
 ##' @param x A SwitchrParam object
 ##' @rdname dl_method
 ##' @docType methods
+##' @return for the getter, the download method specified in the
+##' \code{SwitchrParam} object, for the setter, the object
+##' updated with the new download method.
 ##' @export
 
 setGeneric("dl_method", function(x) standardGeneric("dl_method"))
@@ -100,13 +103,13 @@ setMethod("dl_method<-", "SwitchrParam", function(x, value) {
 
 
 ##' @title archive_retries
-##' 
+##'
 ##' @description Get or set the number of times to retry downloading a file from
 ##' the CRAN archive
 ##'
 ##' This is intended to stop intermittent install failures
 ##' due to failing to retrieve files that *are* in the
-##' archive but are not downloading properly when a larger 
+##' archive but are not downloading properly when a larger
 ##' number of packages is being retrieved.
 ##'
 ##' @param x A SwitchrParam object
@@ -173,7 +176,7 @@ setMethod("dep_repos<-", "PkgManifest", function(x, value) {
 })
 
 
-##'@rdname dep_repos
+##' @rdname dep_repos
 ##' @aliases dep_repos<-,SessionManifest
 setMethod("dep_repos<-", "SessionManifest", function(x, value) {
     man = manifest(x)
@@ -185,8 +188,6 @@ setMethod("dep_repos<-", "SessionManifest", function(x, value) {
 
 
 ##' @title Get or set the manifest associated with an object
-##' 
-##'
 ##' @description Get or set manifest associated with an object
 ##'
 ##' @rdname manifest_methods
@@ -211,7 +212,7 @@ setMethod("manifest", "SessionManifest",
 
 ##' @rdname manifest_methods
 ##' @aliases manifest<-,SessionManifest
- 
+
 setMethod("manifest<-", "SessionManifest",
           function(x, value ) {
               x@pkg_manifest = value
@@ -233,12 +234,15 @@ setMethod("manifest<-", "SessionManifest",
 ##' @param ... unused.
 ##' @docType methods
 ##' @export
+##' @return for the getter, the manifest data.frame corresponding to the manifest,
+##' for the setter, a manifest updated with the new manifest data.frame.
 setGeneric("manifest_df", function(x, ...) standardGeneric("manifest_df"))
 
 ## only get manifest rows for pkgs in the 'session' by default
 ## override with session_only=FALSE if desired
 ##' @aliases manifest_df,SessionManifest
-##' @param session_only Only return manifest rows associated with 
+##' @param session_only Only return manifest rows associated with the
+##' versioned cohort defined in \code{x} (\code{SessionManifest}s only).
 ##' @rdname manifest_df
 
 setMethod("manifest_df", "SessionManifest",
@@ -250,7 +254,7 @@ setMethod("manifest_df", "SessionManifest",
                   mdf = mdf[mdf$name %in% versions_df(x)$name,]
               mdf
           })
-          
+
 
 
 ##' @aliases manifest_df,PkgManifest
@@ -282,13 +286,16 @@ setMethod("manifest_df<-", "PkgManifest", function(x, value) {
     })
 
 ##' @title versions_df
-##' 
+##'
 ##' @description Get or set the the versions information in a SessionManifest
-##' 
+##'
 ##' @param x An object containing package version information
 ##' @rdname versions
 ##' @docType methods
 ##' @export
+##' @return For the getter, a data.frame indicating the versions-specific cohort
+##' of packages defined by \code{x}, for the setter, the \code{SessionManifest} object
+##' updated with the new versions data.frame.
 setGeneric("versions_df", function(x) standardGeneric("versions_df"))
 
 ##' @aliases versions_df,SessionManifest
@@ -319,12 +326,15 @@ setMethod("versions_df<-", "SessionManifest", function(x, value) {
 
 
 
-##' @title branch 
+##' @title branch
 ##' @description Get or set the branch associated with a Package Source
 ##' @export
 ##' @param x A source
 ##' @rdname branch
 ##' @docType methods
+##' @return for the getter, the branch associated with the source
+##' object, for the setter, the object updated to use the specified
+##' branch.
 setGeneric("branch", function(x) standardGeneric("branch"))
 ##' @aliases branch,PkgSource
 ##' @rdname branch
@@ -348,6 +358,9 @@ setMethod("branch<-", "PkgSource", function(x, value) {
 ##' @param x A source
 ##' @rdname pkgname
 ##' @docType methods
+##' @return for the getter, the package name as a string, for the setter,
+##' an updated \code{PkgSource} (or subclass) object with the new
+##' package name.
 setGeneric("pkgname", function(x) standardGeneric("pkgname"))
 ##' @aliases pkgname,PkgSource
 ##' @rdname pkgname
@@ -366,11 +379,14 @@ setMethod("pkgname<-", "PkgSource", function(x, value) {
 
 
 ##' @title subdir
-##' @description accessor for subdirectory. 
+##' @description accessor for subdirectory.
 ##' @rdname subdir
 ##' @param x An object associated with a subdirectory, typically a PkgSource
 ##' @docType methods
 ##' @export
+##' @return For the getter, the subdirectory within the overall source to
+##' find the actual package source code, for the setter, an updated
+##' \code{PkgSource} object with the new subdirectory set.
 
 setGeneric("subdir", function(x) standardGeneric("subdir"))
 ##' @aliases subdir,PkgSource
@@ -411,6 +427,9 @@ setMethod("location", "PkgSource", function(repo) repo@location)
 ##' @export
 ##' @param x An object associated with a SwitchrParam object
 ##' @rdname sh_init
+##' @return For the getter, the shell initialization script/commands,
+##' for the setter, an updated \code{SwitchrParam} object with the
+##' new shell initialization set.
 setGeneric("sh_init_script", function(x) standardGeneric("sh_init_script"))
 
 ##' @aliases sh_init_script,SwitchrParam
@@ -457,7 +476,7 @@ setMethod("logfun<-", "SwitchrParam", function(x, value) {
 
 
 ## @title Add/replace rows in a data.frame
-## 
+##
 ## Combine two dataframes together with rows in one optionally replacing
 ## those in the other when they match on a specified index column
 ##
@@ -483,12 +502,12 @@ addReplaceDF = function(df, newdf, replace = TRUE, indexcol = "name") {
             stop("Values in new rows already appear in existing rows, set replace=TRUE to replace them inplace. [",
                  paste(dups, collapse=", "),
                  "]")
-        
+
         dupdf = newdf[newvec %in% dups,]
         newdf = newdf[!newvec %in% dups,]
         df[match(dupdf[[indexcol]], oldvec),] = dupdf
     }
-    
+
     rbind(df, newdf)
 }
 
@@ -507,6 +526,8 @@ addReplaceDF = function(df, newdf, replace = TRUE, indexcol = "name") {
 ##' @param replace logical. If true, the specified package info will replace
 ##' any already in the manifest in the case of duplicates. Otherwise, an error
 ##' is thrown.
+##' @return \code{x}, with the relevant package(s) added to it (in the case
+##' of a manifest) or its associated manifest.
 ##' @docType methods
 setGeneric("addPkg", function(x, ..., rows = makeManifest(...),
                               versions = data.frame(name = manifest_df(rows)$name,
@@ -546,7 +567,7 @@ setMethod("addPkg", "SessionManifest",
                   if(is(versions, "character"))
                       versions = data.frame(name = names(versions),
                           version = versions, stringsAsFactors = FALSE)
-                  
+
                   oldv = versions_df(x)
                   ## versions = versions[,names(oldv)]
                   ## versions_df(x) = rbind(oldv, versions)
@@ -562,6 +583,9 @@ setMethod("addPkg", "SessionManifest",
 ##' @export
 ##' @docType methods
 ##' @rdname library_paths
+##' @return for the getter, the set of library paths associated with
+##' the \code{SwitchrCtx} object, for the setter, said context udpated
+##' with the new full set of library paths.
 setGeneric("library_paths", function(seed) standardGeneric("library_paths"))
 
 ##' @rdname library_paths
@@ -580,6 +604,9 @@ setMethod("library_paths", "SwitchrCtx", function(seed) {
 ##' @export
 ##' @docType methods
 ##' @rdname full_libpaths
+##' @return For the getter, the full set of library paths associated with the
+##' \code{SwitchrCtx} object, for the setter, the object, updated with the
+##' new set of full lib paths.
 
 setGeneric("full_libpaths", function(seed) standardGeneric("full_libpaths"))
 
@@ -597,6 +624,8 @@ setMethod("full_libpaths", "SwitchrCtx", function(seed) {
 ##' @rdname packages
 ##' @param seed A switchr context
 ##' @export
+##' @return a vector of package names installed in the
+##' specified switchr context.
 setGeneric("packages", function(seed) standardGeneric("packages"))
 ##' @rdname packages
 ##' @aliases packages,SwitchrCtx
@@ -609,7 +638,7 @@ setMethod("update_pkgs_list", "SwitchrCtx", function(seed){
 
               pathsToLook = full_libpaths(seed)
 
-    
+
     pkgs = installed.packages(pathsToLook,
         noCache=TRUE)[,c("Package", "Version", "LibPath")]
     pkgs = pkgs[!duplicated(pkgs[,"Package"]),]
@@ -620,7 +649,7 @@ setMethod("update_pkgs_list", "SwitchrCtx", function(seed){
 })
 
 ##' @title Notrack directory
-##' 
+##'
 ##' @description This function is not intended to be called directly by the user.
 ##'
 ##' @param repo The object.

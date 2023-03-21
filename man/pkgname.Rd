@@ -23,6 +23,11 @@ pkgname(x) <- value
 
 \item{value}{The new pkgname}
 }
+\value{
+for the getter, the package name as a string, for the setter,
+an updated \code{PkgSource} (or subclass) object with the new
+package name.
+}
 \description{
 Get or set the package name associated with a Package Source
 }

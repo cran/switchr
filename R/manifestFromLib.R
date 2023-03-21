@@ -24,19 +24,27 @@
 ##' if(!intr){
 ##' oldlp <- .libPaths()
 ##' .libPaths(tail(oldlp, 1))
+##' oldgi <- graceful_inet()
+##' graceful_inet(TRUE)
 ##' }
 ##' }
-##' man = libManifest()
-##' man
+##' if(interactive()) {
+##'   man = libManifest()
+##'   man
+##' }
 ##' \dontshow{
-##' if(!intr)
+##' if(!intr) {
 ##'   .libPaths(oldlp)
+##'   graceful_inet(oldgi)
+##' }
 ##' }
 ##' \dontrun{
 ##' man2 = libManifest("myotherlib")
 ##' man2
 ##' }
 ##' @export
+##' @return a \code{SessionManifest} object containing version-specified
+##' entries for all packages installed in the specified library path(s).
 setGeneric("libManifest", function(lib = currentCompEnv(),
                                    record_versions = TRUE,
                                    known_manifest = makeManifest(dep_repos = repos),
@@ -217,6 +225,8 @@ setMethod("libManifest", "SwitchrCtx",
 ##' @export
 ##' @docType methods
 ##' @rdname makeSeedMan
+##' @return a \code{SessionManifest} specifying a set of packages and their
+##' specific versions.
 
 
 setGeneric("makeSeedMan", function(x, known_manifest = PkgManifest(), ...) standardGeneric("makeSeedMan"))
@@ -227,6 +237,8 @@ setGeneric("makeSeedMan", function(x, known_manifest = PkgManifest(), ...) stand
 ##' @aliases makeSeedMan,missing
 ##' @importFrom utils capture.output sessionInfo
 setMethod("makeSeedMan", "missing", function(x, known_manifest = PkgManifest(), ...) {
+    print("missing method")
+    print(defaultRepos())
               parsed = parseSessionInfoString(capture.output(print(sessionInfo())))
               makeSeedMan(parsed, known_manifest = known_manifest, ...)
 })
@@ -236,6 +248,7 @@ setMethod("makeSeedMan", "missing", function(x, known_manifest = PkgManifest(), 
 ##' @rdname makeSeedMan
 ##' @aliases makeSeedMan,sessionInfo
 setMethod("makeSeedMan", "sessionInfo", function(x, known_manifest = PkgManifest(), ...) {
+    print("sessionInfo method")
               parsed = parseSessionInfoString(capture.output(print(x)))
               makeSeedMan(parsed, known_manifest = known_manifest, ...)
 })
@@ -244,7 +257,7 @@ setMethod("makeSeedMan", "sessionInfo", function(x, known_manifest = PkgManifest
 ##' @rdname makeSeedMan
 ##' @aliases makeSeedMan,parsedSessionInfo
 setMethod("makeSeedMan", "parsedSessionInfo", function(x, known_manifest = PkgManifest(), ...) {
-
+    print("parsedSessionInfo method")
     sinfopkginfo = rbind(x@attached, x@loaded)
     sinfopkginfo = sinfopkginfo[!sinfopkginfo[,"Package"] %in% basepkgs,]
     sinfopkginfo = as.data.frame(sinfopkginfo, stringsAsFactors = FALSE)
@@ -260,7 +273,8 @@ setMethod("makeSeedMan", "parsedSessionInfo", function(x, known_manifest = PkgMa
 setMethod("makeSeedMan", "data.frame", function(x, known_manifest = PkgManifest(), ...) {
     ensureCRANmirror(1L)
     stopifnot(all(c("name", "version") %in% names(x)))
-
+    print("data.frame method")
+    print(known_manifest)
     x = x[!(x$name %in% basepkgs),]
 
     mani = PkgManifest(name = x[,"name"],

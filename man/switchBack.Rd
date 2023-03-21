@@ -6,6 +6,9 @@
 \usage{
 switchBack()
 }
+\value{
+silently, the name of the switchr context now active.
+}
 \description{
 A convenience function to switch back to the previously used computing
 environment.

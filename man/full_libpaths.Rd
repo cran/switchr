@@ -14,6 +14,11 @@ full_libpaths(seed)
 \arguments{
 \item{seed}{a SwitchrCtx}
 }
+\value{
+For the getter, the full set of library paths associated with the
+\code{SwitchrCtx} object, for the setter, the object, updated with the
+new set of full lib paths.
+}
 \description{
 Accessor for the full library path associate with a SwitchrCtx, including
 the R library and (if not excluded) the site library

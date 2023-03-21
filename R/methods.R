@@ -211,7 +211,9 @@ getStringType = function(str) {
     if(length(str) > 1) {
         ret = unique(sapply(str, getStringType))
         if(length(ret)  > 1)
-            stop("Got mixed string types (likely in seed). This shouldn't happen.")
+            stop("Got mixed string types (likely in seed). This shouldn't happen.",
+                 paste(str, collapse = "\n"),
+                 paste(ret, collapse = "\n"))
         return(ret)
     }
 
@@ -417,6 +419,7 @@ setMethod("show", "SwitchrCtx", function(object) {
 ##' A convenience function to switch back to the previously used computing
 ##' environment.
 ##' @export
+##' @return silently, the name of the switchr context now active.
 switchBack = function() {
     if(length(Renvs$stack) < 2) {
         warning("No previous computing environment to switch back to. Computing environment will remain unchanged")
@@ -430,6 +433,9 @@ switchBack = function() {
 ##' Display the computing environment currently in use. If switchTo has not been
 ##' called, a new SwitchrCtx object describing the current environment is
 ##' created.
+##'
+##' @return A \code{SwitchrCtx} object representing the current computing
+##' environment.
 ##' @export
 currentCompEnv = function() {
             if(is.null(Renvs$stack)) {
@@ -455,6 +461,8 @@ currentCompEnv = function() {
 ##' of optionally excluding the site library
 ##' @rdname librarypath
 ##' @export
+##' @return a vector of library paths currently in use, optionally
+##' excluding the site library.
 
 .libPaths2 = function(fulllp, exclude.site=TRUE) {
     fun = .libPaths

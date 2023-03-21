@@ -33,6 +33,10 @@ known_manifest and official repositories.}
 
 \item{...}{Currently unused.}
 }
+\value{
+a \code{SessionManifest} specifying a set of packages and their
+specific versions.
+}
 \description{
 makeSeedMan
 }

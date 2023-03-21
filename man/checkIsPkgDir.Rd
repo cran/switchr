@@ -7,8 +7,17 @@
 checkIsPkgDir(dir)
 }
 \arguments{
-\item{dir}{The directory}
+\item{dir}{The directory.}
+}
+\value{
+Logical scalar indicating if the directory
+contains the source code for a package.
 }
 \description{
 Check if a directory contains package sources
+}
+\details{
+Any directory containing a \code{DESCRIPTION}
+file as a direct child is considered a package source
+directory, while any that do not are not.
 }

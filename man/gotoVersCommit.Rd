@@ -32,6 +32,10 @@ gotoVersCommit(dir, src, version, param = SwitchrParam())
 
 \item{param}{A SwitchrParam}
 }
+\value{
+\code{dir}, after the side-effect of checking out the commit
+associated with the specified version is complete.
+}
 \description{
 This is a low-level function not intended for direct use by the end user.
 }

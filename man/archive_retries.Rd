@@ -33,6 +33,6 @@ the CRAN archive
 
 This is intended to stop intermittent install failures
 due to failing to retrieve files that *are* in the
-archive but are not downloading properly when a larger 
+archive but are not downloading properly when a larger
 number of packages is being retrieved.
 }

@@ -14,6 +14,10 @@ packages(seed)
 \arguments{
 \item{seed}{A switchr context}
 }
+\value{
+a vector of package names installed in the
+specified switchr context.
+}
 \description{
 List the packages installed in a switchr context (library)
 }

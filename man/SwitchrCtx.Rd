@@ -18,6 +18,9 @@ context when it is switched to (TRUE) '}
 \item{seed}{An object representing the list of packages the switchr context
 was seeded with.}
 }
+\value{
+a \code{SwitchrCtx} object.
+}
 \description{
 A constructor for class SwitchrCtx, represenging a switchr installed-package library.
 }

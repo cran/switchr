@@ -1,5 +1,5 @@
 ##' makePkgDir
-##' 
+##'
 ##' This is an internal function not intended to be called directly by end users
 ##'
 ##' Create a directory and populate it with package source code from the
@@ -58,7 +58,7 @@ setGeneric("makePkgDir",
 ##' @export
 ##' @author Gabriel Becker
 ##' @rdname lazyRepo
-##' @references Becker G, Barr C, Gentleman R, Lawrence M; Enhancing Reproducibility and Collaboration via Management of R Package Cohorts. Journal of Statistical Software, 81(1). 2017. doi: 10.18637/jss.v082.i01 
+##' @references Becker G, Barr C, Gentleman R, Lawrence M; Enhancing Reproducibility and Collaboration via Management of R Package Cohorts. Journal of Statistical Software, 81(1). 2017. doi: 10.18637/jss.v082.i01
 ##' @docType methods
 setGeneric("lazyRepo",
            function(pkgs,
@@ -75,7 +75,7 @@ setGeneric("lazyRepo",
 
 
 ##' gotoVersCommit
-##' 
+##'
 ##' This is a low-level function not intended for direct use by the end user.
 ##' @docType methods
 ##' @param dir Directory
@@ -84,4 +84,7 @@ setGeneric("lazyRepo",
 ##' @param param A SwitchrParam
 ##' @rdname gotoVersCommit
 ##' @export
+##'
+##' @return \code{dir}, after the side-effect of checking out the commit
+##' associated with the specified version is complete.
 setGeneric("gotoVersCommit", function(dir, src, version, param = SwitchrParam()) standardGeneric("gotoVersCommit"))

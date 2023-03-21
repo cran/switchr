@@ -9,6 +9,9 @@ biocReposForVers(version)
 \arguments{
 \item{version}{The Bioconductor release to generate URLs for.}
 }
+\value{
+the repositories associated with the specified Bioconductor version.
+}
 \description{
 Generate the URLs of the repositories associated with
 a specific Bioconductor release

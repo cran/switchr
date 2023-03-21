@@ -33,6 +33,10 @@ defaults for \code{user} and \code{password}}
 
 \item{\dots}{Passed directly to constructors for PkgSource superclasses}
 }
+\value{
+an object inheriting from \code{PkgSource} for the specified
+location of a package's source code.
+}
 \description{
 Create a PkgSource object for a package
 }

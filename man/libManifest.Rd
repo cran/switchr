@@ -60,6 +60,10 @@ location information for packages not installed via
 
 \item{\dots}{currently unused}
 }
+\value{
+a \code{SessionManifest} object containing version-specified
+entries for all packages installed in the specified library path(s).
+}
 \description{
 Create a Session- or PkgManifest for the contents of a switchr
 library.
@@ -75,13 +79,19 @@ intr <- interactive()
 if(!intr){
 oldlp <- .libPaths()
 .libPaths(tail(oldlp, 1))
+oldgi <- graceful_inet()
+graceful_inet(TRUE)
 }
 }
-man = libManifest()
-man
+if(interactive()) {
+  man = libManifest()
+  man
+}
 \dontshow{
-if(!intr)
+if(!intr) {
   .libPaths(oldlp)
+  graceful_inet(oldgi)
+}
 }
 \dontrun{
 man2 = libManifest("myotherlib")

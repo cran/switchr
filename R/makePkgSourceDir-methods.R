@@ -2,6 +2,8 @@
 # function(name, source, path, repo) {
 ##'@rdname makePkgDir
 ##' @aliases makePkgDir,ANY,SVNSource
+##' @return logical scalar indicating success (\code{TRUE}) or failure of
+##' the operation.
 setMethod("makePkgDir", c(name = "ANY", source = "SVNSource"), function(name, source,
     path, latest_only = FALSE, param, forceRefresh = FALSE) {
     lfun = logfun(param)
@@ -120,7 +122,7 @@ setMethod("makePkgDir", c(name = "ANY", source = "GitSource"), function(name, so
             return(FALSE)
         }
         medwd = setwd(name)
-        
+
         args2 = c("checkout", branch(source))
         res2 = tryCatch(system_w_init("git", args = args2, intern = TRUE, param = param),
             error = function(e) e)
